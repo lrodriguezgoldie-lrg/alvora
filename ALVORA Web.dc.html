@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Italiana&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>*{box-sizing:border-box}body{margin:0;background:#FBF8F3;color:#18293A;font-family:'Raleway',sans-serif}a{color:#18293A;text-decoration:none}a:hover{color:#9C7F52}input,select,textarea,button{font-family:inherit;font-size:15px}</style>
+</helmet>
+<div style="min-height:100vh;display:flex;flex-direction:column;background:#FBF8F3">
+
+<sc-if value="{{ isPublic }}" hint-placeholder-val="{{ true }}">
+<header style="position:sticky;top:0;z-index:2000;background:#18293A;color:#EEE3D0;border-bottom:1px solid #2C3E51">
+  <div style="max-width:1280px;margin:0 auto;padding:16px 32px;display:flex;align-items:center;justify-content:space-between;gap:20px 32px;flex-wrap:wrap">
+    <a href="#/" style="display:flex;flex-direction:column;gap:6px;color:#EEE3D0">
+      <div style="display:flex;flex-direction:column;align-items:stretch;gap:9px"><span style="font-family:'Italiana';font-size:30px;letter-spacing:0.3em;line-height:1">ALVOR<span style="letter-spacing:0">A</span></span><div style="display:flex;justify-content:space-between;font-family:'Raleway';font-size:8.5px;line-height:1;color:#C9AE82"><span>C</span><span>O</span><span>N</span><span>E</span><span>C</span><span>T</span><span>A</span><span>N</span><span>D</span><span>O</span><span style="width:0.5em"></span><span>O</span><span>P</span><span>O</span><span>R</span><span>T</span><span>U</span><span>N</span><span>I</span><span>D</span><span>A</span><span>D</span><span>E</span><span>S</span></div></div>
+    </a>
+    <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ false }}">
+      <button onClick="{{ toggleMenu }}" aria-label="Menú" style="width:44px;height:44px;background:none;border:1px solid #3A4B5D;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;padding:0">
+        <span style="display:block;width:20px;height:1px;background:#EEE3D0;transform:{{ bar1 }};transition:transform 0.2s"></span>
+        <span style="display:block;width:20px;height:1px;background:#EEE3D0;opacity:{{ bar2 }};transition:opacity 0.2s"></span>
+        <span style="display:block;width:20px;height:1px;background:#EEE3D0;transform:{{ bar3 }};transition:transform 0.2s"></span>
+      </button>
+    </sc-if>
+    <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+      <nav style="width:100%;display:flex;flex-direction:column;border-top:1px solid #2C3E51;padding:8px 0 16px">
+        <sc-for list="{{ nav }}" as="n" hint-placeholder-count="6"><a href="{{ n.href }}" style="font-size:14px;letter-spacing:0.16em;text-transform:uppercase;color:{{ n.color }};padding:16px 0;border-bottom:1px solid #2C3E51">{{ n.label }}</a></sc-for>
+        <div style="display:flex;border:1px solid #3A4B5D;align-self:flex-start;margin-top:20px"><sc-for list="{{ langOpts }}" as="o" hint-placeholder-count="2"><button onClick="{{ o.onClick }}" style="background:{{ o.bg }};color:{{ o.fg }};border:none;padding:10px 16px;font-size:12px;letter-spacing:0.12em;cursor:pointer">{{ o.label }}</button></sc-for></div>
+      </nav>
+    </sc-if>
+    <sc-if value="{{ isDesktop }}" hint-placeholder-val="{{ true }}">
+    <nav style="display:flex;gap:8px 26px;flex-wrap:wrap;align-items:center">
+      <sc-for list="{{ nav }}" as="n" hint-placeholder-count="6"><a href="{{ n.href }}" style="font-size:12.5px;letter-spacing:0.14em;text-transform:uppercase;color:{{ n.color }};padding:6px 0;border-bottom:1px solid {{ n.border }}">{{ n.label }}</a></sc-for>
+      <div style="display:flex;border:1px solid #3A4B5D"><sc-for list="{{ langOpts }}" as="o" hint-placeholder-count="2"><button onClick="{{ o.onClick }}" style="background:{{ o.bg }};color:{{ o.fg }};border:none;padding:7px 10px;font-size:11px;letter-spacing:0.12em;cursor:pointer">{{ o.label }}</button></sc-for></div>
+    </nav>
+    </sc-if>
+  </div>
+</header>
+</sc-if>
+
+<main style="flex:1">
+
+<sc-if value="{{ pg.inicio }}" hint-placeholder-val="{{ true }}">
+  <section style="background:#18293A;color:#EEE3D0">
+    <div style="max-width:1280px;margin:0 auto;padding:clamp(64px,10vw,140px) 32px clamp(56px,8vw,110px);display:flex;flex-direction:column;gap:32px">
+      <div style="font-size:12px;letter-spacing:0.3em;text-transform:uppercase;color:#C9AE82">{{ t.heroEyebrow }}</div>
+      <h1 style="margin:0;font-family:'Italiana';font-weight:400;font-size:clamp(44px,7vw,96px);line-height:1.05;max-width:1000px;text-wrap:balance">{{ t.heroTitle }}</h1>
+      <p style="margin:0;font-size:clamp(17px,1.6vw,21px);line-height:1.6;max-width:640px;color:#C8CED5;font-weight:300">{{ t.heroSub }}</p>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;max-width:980px;margin-top:12px">
+        <select name="op" value="{{ qs.op }}" onChange="{{ onQs }}" style="flex:1 1 160px;padding:16px;background:#1F3347;color:#EEE3D0;border:1px solid #3A4B5D;outline:none"><option value="">{{ t.opAny }}</option><option value="venta">{{ t.venta }}</option><option value="alquiler">{{ t.alquiler }}</option></select>
+        <select name="type" value="{{ qs.type }}" onChange="{{ onQs }}" style="flex:1 1 180px;padding:16px;background:#1F3347;color:#EEE3D0;border:1px solid #3A4B5D;outline:none"><sc-for list="{{ typeOptions }}" as="o" hint-placeholder-count="1"><option value="{{ o.v }}">{{ o.label }}</option></sc-for></select>
+        <select name="barrio" value="{{ qs.barrio }}" onChange="{{ onQs }}" style="flex:1 1 200px;padding:16px;background:#1F3347;color:#EEE3D0;border:1px solid #3A4B5D;outline:none"><sc-for list="{{ barrioOptions }}" as="o" hint-placeholder-count="1"><option value="{{ o.v }}">{{ o.label }}</option></sc-for></select>
+        <button onClick="{{ doSearch }}" style="flex:0 0 auto;background:#C9AE82;color:#18293A;border:none;padding:16px 36px;font-size:13px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;cursor:pointer" style-hover="background:#D8C29C">{{ t.search }}</button>
+      </div>
+    </div>
+  </section>
+
+  <section style="max-width:1280px;margin:0 auto;padding:96px 32px 40px;display:flex;flex-direction:column;gap:40px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap">
+      <h2 style="margin:0;font-family:'Italiana';font-weight:400;font-size:clamp(34px,4vw,52px)">{{ t.featured }}</h2>
+      <a href="#/propiedades" style="font-size:13px;letter-spacing:0.18em;text-transform:uppercase;border-bottom:1px solid #C9AE82;padding-bottom:4px">{{ t.viewAll }}</a>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:28px">
+      <sc-for list="{{ featuredCards }}" as="c" hint-placeholder-count="3">
+        <a href="{{ c.href }}" style="display:flex;flex-direction:column;background:#FFFFFF;border:1px solid #E6DDCE;color:#18293A" style-hover="border-color:#C9AE82;color:#18293A">
+          <div style="position:relative;aspect-ratio:4/3;background:repeating-linear-gradient(135deg,#E9E1D3 0 12px,#E3DACA 12px 24px);overflow:hidden">
+            <sc-if value="{{ c.hasPhoto }}"><img src="{{ c.photo }}" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></sc-if>
+            <sc-if value="{{ c.noPhoto }}"><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:monospace;font-size:12px;color:#8C8170">{{ t.noPhotos }}</div></sc-if>
+            <div style="position:absolute;top:14px;left:14px;display:flex;gap:6px"><span style="background:#18293A;color:#EEE3D0;font-size:11px;letter-spacing:0.16em;padding:6px 10px;text-transform:uppercase">{{ c.opLabel }}</span><sc-if value="{{ c.hasStatus }}"><span style="background:#C9AE82;color:#18293A;font-size:11px;letter-spacing:0.16em;padding:6px 10px;text-transform:uppercase">{{ c.statusLabel }}</span></sc-if></div>
+          </div>
+          <div style="padding:22px 22px 24px;display:flex;flex-direction:column;gap:10px">
+            <div style="font-size:12px;letter-spacing:0.16em;text-transform:uppercase;color:#9C7F52">{{ c.typeLabel }} · {{ c.barrio }}</div>
+            <div style="font-family:'Italiana';font-size:26px;line-height:1.2">{{ c.title }}</div>
+            <div style="font-size:20px;font-weight:500">{{ c.price }}</div>
+            <div style="font-size:13px;color:#5A6573;border-top:1px solid #EEE7DB;padding-top:12px;margin-top:4px">{{ c.specs }}</div>
+          </div>
+        </a>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="max-width:1280px;margin:0 auto;padding:80px 32px;display:flex;flex-direction:column;gap:40px">
+    <div style="display:flex;flex-direction:column;gap:14px"><h2 style="margin:0;font-family:'Italiana';font-weight:400;font-size:clamp(34px,4vw,52px)">{{ t.whatTitle }}</h2><p style="margin:0;font-size:18px;color:#5A6573;font-weight:300">{{ t.whatLead }}</p></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1px;background:#E2D8C7;border:1px solid #E2D8C7">
+      <sc-for list="{{ services }}" as="v" hint-placeholder-count="4">
+        <div onClick="{{ v.onClick }}" style="background:#FBF8F3;padding:36px 30px;display:flex;flex-direction:column;gap:14px;cursor:pointer" style-hover="background:#F3ECE0">
+          <div style="font-size:13px;letter-spacing:0.2em;color:#9C7F52">{{ v.n }}</div>
+          <div style="font-family:'Italiana';font-size:28px;line-height:1.15">{{ v.t }}</div>
+          <div style="font-size:15px;line-height:1.6;color:#4A5563">{{ v.d }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="max-width:1280px;margin:0 auto;padding:0 32px 96px;display:flex;flex-direction:column;gap:40px">
+    <div style="display:flex;flex-direction:column;gap:14px"><h2 style="margin:0;font-family:'Italiana';font-weight:400;font-size:clamp(34px,4vw,52px)">{{ t.zonesTitle }}</h2><p style="margin:0;font-size:18px;color:#5A6573;font-weight:300">{{ t.zonesLead }}</p></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px">
+      <sc-for list="{{ zones }}" as="z" hint-placeholder-count="4">
+        <div onClick="{{ z.onClick }}" style="background:#18293A;color:#EEE3D0;padding:44px 30px 30px;min-height:220px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer" style-hover="background:#22384D">
+          <div style="font-family:'Italiana';font-size:34px;line-height:1.1">{{ z.name }}</div>
+          <div style="font-size:12px;letter-spacing:0.2em;text-transform:uppercase;color:#C9AE82">{{ z.count }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="background:#EEE3D0">
+    <div style="max-width:1280px;margin:0 auto;padding:88px 32px;display:flex;justify-content:space-between;align-items:center;gap:32px;flex-wrap:wrap">
+      <div style="display:flex;flex-direction:column;gap:14px;max-width:720px"><h2 style="margin:0;font-family:'Italiana';font-weight:400;font-size:clamp(34px,4vw,52px)">{{ t.sellTitle }}</h2><p style="margin:0;font-size:18px;line-height:1.6;color:#3A4655;font-weight:300">{{ t.sellText }}</p></div>
+      <a href="#/tasar" style="background:#18293A;color:#EEE3D0;padding:18px 34px;font-size:13px;letter-spacing:0.2em;text-transform:uppercase" style-hover="background:#22384D;color:#EEE3D0">{{ t.sellCta }}</a>
+    </div>
+  </section>
+</sc-if>
+
+<sc-if value="{{ pg.propiedades }}" hint-placeholder-val="{{ false }}">
+  <section style="max-width:1280px;margin:0 auto;padding:56px 32px 96px;display:flex;flex-direction:column;gap:32px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;border-bottom:1px solid #E2D8C7;padding-bottom:24px">
+      <div style="display:flex;flex-direction:column;gap:8px"><h1 style="margin:0;font-family:'Italiana';font-weight:400;font-size:clamp(40px,5vw,64px);line-height:1">{{ t.propsTitle }}</h1><div style="font-size:14px;letter-spacing:0.12em;color:#9C7F52;text-transform:uppercase">{{ resultsLabel }}</div></div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+        <select name="sort" value="{{ f.sort }}" onChange="{{ onFilter }}" style="padding:11px 14px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none"><sc-for list="{{ sortOptions }}" as="o" hint-placeholder-count="4"><option value="{{ o.v }}">{{ o.label }}</option></sc-for></select>
+        <div style="display:flex;border:1px solid #18293A"><sc-for list="{{ viewOpts }}" as="o" hint-placeholder-count="2"><button onClick="{{ o.onClick }}" style="background:{{ o.bg }};color:{{ o.fg }};border:none;padding:11px 18px;font-size:12px;letter-spacing:0.16em;text-transform:uppercase;cursor:pointer">{{ o.label }}</button></sc-for></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:44px;align-items:flex-start;flex-wrap:wrap">
+      <aside style="flex:1 1 260px;display:flex;flex-direction:column;gap:26px;max-width:100%">
+        <div style="display:flex;justify-content:space-between;align-items:center"><div style="font-family:'Italiana';font-size:26px">{{ t.filters }}</div><button onClick="{{ clearFilters }}" style="background:none;border:none;color:#9C7F52;font-size:12px;letter-spacing:0.16em;text-transform:uppercase;cursor:pointer;padding:0">{{ t.clear }}</button></div>
+        <div style="display:flex;flex-direction:column;gap:10px"><div style="font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#9C7F52">{{ t.operation }}</div><div style="display:flex;gap:6px;flex-wrap:wrap"><sc-for list="{{ opOpts }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.onClick }}" style="background:{{ o.bg }};color:{{ o.fg }};border:1px solid #18293A;padding:9px 14px;font-size:13px;cursor:pointer">{{ o.label }}</button></sc-for></div></div>
+        <div style="display:flex;flex-direction:column;gap:10px"><div style="font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#9C7F52">{{ t.type }}</div><select name="type" value="{{ f.type }}" onChange="{{ onFilter }}" style="width:100%;padding:12px 14px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none"><sc-for list="{{ typeOptions }}" as="o" hint-placeholder-count="1"><option value="{{ o.v }}">{{ o.label }}</option></sc-for></select></div>
+        <div style="display:flex;flex-direction:column;gap:10px"><div style="font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#9C7F52">{{ t.barrio }}</div><select name="barrio" value="{{ f.barrio }}" onChange="{{ onFilter }}" style="width:100%;padding:12px 14px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none"><sc-for list="{{ barrioOptions }}" as="o" hint-placeholder-count="1"><option value="{{ o.v }}">{{ o.label }}</option></sc-for></select></div>
+        <div style="display:flex;flex-direction:column;gap:10px"><div style="display:flex;justify-content:space-between;align-items:center"><div style="font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#9C7F52">{{ t.price }}</div><div style="display:flex;border:1px solid #18293A"><sc-for list="{{ curOpts }}" as="o" hint-placeholder-count="2"><button onClick="{{ o.onClick }}" style="background:{{ o.bg }};color:{{ o.fg }};border:none;padding:5px 9px;font-size:11px;letter-spacing:0.1em;cursor:pointer">{{ o.label }}</button></sc-for></div></div><div style="display:flex;gap:8px"><input type="number" name="pmin" value="{{ f.pmin }}" onChange="{{ onFilter }}" placeholder="{{ t.min }}" style="width:100%;min-width:0;padding:12px 14px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none"><input type="number" name="pmax" value="{{ f.pmax }}" onChange="{{ onFilter }}" placeholder="{{ t.max }}" style="width:100%;min-width:0;padding:12px 14px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none"></div></div>
+        <div style="display:flex;flex-direction:column;gap:10px"><div style="font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#9C7F52">{{ t.surface }}</div><div style="display:flex;gap:6px"><sc-for list="{{ mbaseOpts }}" as="o" hint-placeholder-count="2"><button onClick="{{ o.onClick }}" style="flex:1;background:{{ o.bg }};color:{{ o.fg }};border:1px solid #18293A;padding:8px 10px;font-size:12px;cursor:pointer">{{ o.label }}</button></sc-for></div><div style="display:flex;gap:8px"><input type="number" name="mmin" value="{{ f.mmin }}" onChange="{{ onFilter }}" placeholder="{{ t.min }}" style="width:100%;min-width:0;padding:12px 14px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none"><input type="number" name="mmax" value="{{ f.mmax }}" onChange="{{ onFilter }}" placeholder="{{ t.max }}" style="width:100%;min-width:0;padding:12px 14px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none"></div></div>
+        <div style="display:flex;flex-direction:column;gap:10px"><div style="font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#9C7F52">{{ t.dorm }}</div><div style="display:flex;gap:6px"><sc-for list="{{ dormOpts }}" as="o" hint-placeholder-count="5"><button onClick="{{ o.onClick }}" style="flex:1;background:{{ o.bg }};color:{{ o.fg }};border:1px solid #18293A;padding:9px 0;font-size:13px;cursor:pointer">{{ o.label }}</button></sc-for></div></div>
+        <div style="display:flex;flex-direction:column;gap:10px"><div style="font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#9C7F52">{{ t.banos }}</div><div style="display:flex;gap:6px"><sc-for list="{{ banosOpts }}" as="o" hint-placeholder-count="4"><button onClick="{{ o.onClick }}" style="flex:1;background:{{ o.bg }};color:{{ o.fg }};border:1px solid #18293A;padding:9px 0;font-size:13px;cursor:pointer">{{ o.label }}</button></sc-for></div></div>
+        <label style="display:flex;gap:10px;align-items:center;font-size:15px;cursor:pointer"><input type="checkbox" name="garaje" checked="{{ f.garaje }}" onChange="{{ onFilter }}" style="width:18px;height:18px;accent-color:#18293A">{{ t.withGarage }}</label>
+        <div style="display:flex;flex-direction:column;gap:10px"><div style="font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#9C7F52">{{ t.amenities }}</div><div style="display:flex;gap:6px;flex-wrap:wrap"><sc-for list="{{ amenOpts }}" as="o" hint-placeholder-count="6"><button onClick="{{ o.onClick }}" style="background:{{ o.bg }};color:{{ o.fg }};border:1px solid #CFC3AE;padding:7px 12px;font-size:13px;cursor:pointer">{{ o.label }}</button></sc-for></div></div>
+      </aside>
+      <div style="flex:999 1 560px;min-width:0;display:flex;flex-direction:column;gap:24px">
+        <sc-if value="{{ noResults }}" hint-placeholder-val="{{ false }}"><div style="padding:64px 32px;border:1px solid #E2D8C7;text-align:center;font-size:17px;color:#5A6573">{{ t.noResults }}</div></sc-if>
+        <sc-if value="{{ isMapView }}" hint-placeholder-val="{{ false }}"><div ref="{{ listMapRef }}" style="height:640px;width:100%;background:#E9E1D3"></div></sc-if>
+        <sc-if value="{{ isGridView }}" hint-placeholder-val="{{ true }}">
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:24px">
+            <sc-for list="{{ cards }}" as="c" hint-placeholder-count="6">
+              <a href="{{ c.href }}" style="display:flex;flex-direction:column;background:#FFFFFF;border:1px solid #E6DDCE;color:#18293A" style-hover="border-color:#C9AE82;color:#18293A">
+                <div style="position:relative;aspect-ratio:4/3;background:repeating-linear-gradient(135deg,#E9E1D3 0 12px,#E3DACA 12px 24px);overflow:hidden">
+                  <sc-if value="{{ c.hasPhoto }}"><img src="{{ c.photo }}" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></sc-if>
+                  <sc-if value="{{ c.noPhoto }}"><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:monospace;font-size:12px;color:#8C8170">{{ t.noPhotos }}</div></sc-if>
+                  <div style="position:absolute;top:14px;left:14px;display:flex;gap:6px"><span style="background:#18293A;color:#EEE3D0;font-size:11px;letter-spacing:0.16em;padding:6px 10px;text-transform:uppercase">{{ c.opLabel }}</span><sc-if value="{{ c.hasStatus }}"><span style="background:#C9AE82;color:#18293A;font-size:11px;letter-spacing:0.16em;padding:6px 10px;text-transform:uppercase">{{ c.statusLabel }}</span></sc-if></div>
+                </div>
+                <div style="padding:20px 20px 22px;display:flex;flex-direction:column;gap:9px">
+                  <div style="font-size:12px;letter-spacing:0.16em;text-transform:uppercase;color:#9C7F52">{{ c.typeLabel }} · {{ c.barrio }}</div>
+                  <div style="font-family:'Italiana';font-size:24px;line-height:1.2">{{ c.title }}</div>
+                  <div style="font-size:19px;font-weight:500">{{ c.price }}</div>
+                  <div style="font-size:13px;color:#5A6573;border-top:1px solid #EEE7DB;padding-top:12px;margin-top:4px">{{ c.specs }}</div>
+                </div>
+              </a>
+            </sc-for>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </section>
+</sc-if>
+
+<sc-if value="{{ pg.propiedad }}" hint-placeholder-val="{{ false }}">
+  <sc-if value="{{ noProp }}" hint-placeholder-val="{{ false }}"><section style="max-width:1280px;margin:0 auto;padding:120px 32px;display:flex;flex-direction:column;gap:24px;align-items:flex-start"><div style="font-family:'Italiana';font-size:40px">{{ t.notFound }}</div><a href="#/propiedades" style="font-size:13px;letter-spacing:0.18em;text-transform:uppercase;border-bottom:1px solid #C9AE82;padding-bottom:4px">{{ t.back }}</a></section></sc-if>
+  <sc-if value="{{ hasProp }}" hint-placeholder-val="{{ false }}">
+    <section style="max-width:1280px;margin:0 auto;padding:40px 32px 96px;display:flex;flex-direction:column;gap:32px">
+      <a href="#/propiedades" style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#9C7F52">← {{ t.back }}</a>
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap">
+        <div style="display:flex;flex-direction:column;gap:12px;max-width:820px">
+          <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#9C7F52">{{ P.eyebrow }}</div>
+          <h1 style="margin:0;font-family:'Italiana';font-weight:400;font-size:clamp(38px,5vw,64px);line-height:1.05">{{ P.title }}</h1>
+          <div style="font-size:16px;color:#5A6573">{{ P.address }}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end"><div style="font-size:clamp(26px,3vw,36px);font-weight:500">{{ P.price }}</div><div style="font-size:13px;color:#5A6573">{{ P.original }}</div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="position:relative;aspect-ratio:16/9;max-height:680px;width:100%;background:repeating-linear-gradient(135deg,#E9E1D3 0 14px,#E3DACA 14px 28px);overflow:hidden">
+          <sc-if value="{{ P.hasPhotos }}"><img src="{{ P.mainPhoto }}" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></sc-if>
+          <sc-if value="{{ P.noPhotos }}"><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:monospace;font-size:13px;color:#8C8170">{{ t.noPhotos }}</div></sc-if>
+          <sc-if value="{{ P.multi }}">
+            <button onClick="{{ P.prev }}" style="position:absolute;left:16px;top:50%;transform:translateY(-50%);width:48px;height:48px;background:rgba(24,41,58,0.85);color:#EEE3D0;border:none;font-size:20px;cursor:pointer">‹</button>
+            <button onClick="{{ P.next }}" style="position:absolute;right:16px;top:50%;transform:translateY(-50%);width:48px;height:48px;background:rgba(24,41,58,0.85);color:#EEE3D0;border:none;font-size:20px;cursor:pointer">›</button>
+            <div style="position:absolute;right:16px;bottom:16px;background:rgba(24,41,58,0.85);color:#EEE3D0;font-size:12px;letter-spacing:0.12em;padding:6px 10px">{{ P.counter }}</div>
+          </sc-if>
+        </div>
+        <sc-if value="{{ P.multi }}"><div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px"><sc-for list="{{ P.thumbs }}" as="th" hint-placeholder-count="4"><img src="{{ th.src }}" alt="" onClick="{{ th.onClick }}" style="width:110px;height:74px;object-fit:cover;flex:0 0 auto;cursor:pointer;opacity:{{ th.op }};outline:2px solid {{ th.ring }};outline-offset:-2px"></sc-for></div></sc-if>
+      </div>
+      <div style="display:flex;gap:56px;align-items:flex-start;flex-wrap:wrap">
+        <div style="flex:999 1 560px;min-width:0;display:flex;flex-direction:column;gap:48px">
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:1px;background:#E2D8C7;border:1px solid #E2D8C7">
+            <sc-for list="{{ P.specs }}" as="sp" hint-placeholder-count="6"><div style="background:#FBF8F3;padding:18px 20px;display:flex;flex-direction:column;gap:6px"><div style="font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:#9C7F52">{{ sp.label }}</div><div style="font-size:18px">{{ sp.value }}</div></div></sc-for>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:16px"><h2 style="margin:0;font-family:'Italiana';font-weight:400;font-size:34px">{{ t.description }}</h2><sc-for list="{{ P.paras }}" as="para" hint-placeholder-count="2"><p style="margin:0;font-size:17px;line-height:1.75;color:#3A4655;text-wrap:pretty">{{ para }}</p></sc-for></div>
+          <sc-if value="{{ P.hasAmen }}"><div style="display:flex;flex-direction:column;gap:16px"><h2 style="margin:0;font-family:'Italiana';font-weight:400;font-size:34px">{{ t.amenTitle }}</h2><div style="display:flex;gap:8px;flex-wrap:wrap"><sc-for list="{{ P.amen }}" as="am" hint-placeholder-count="4"><span style="border:1px solid #CFC3AE;padding:9px 14px;font-size:14px">{{ am }}</span></sc-for></div></div></sc-if>
+          <sc-if value="{{ P.hasEmbed }}"><div style="display:flex;flex-direction:column;gap:16px"><h2 style="margin:0;font-family:'Italiana';font-weight:400;font-size:34px">{{ t.video }}</h2><iframe src="{{ P.embed }}" title="video" allow="autoplay; fullscreen; xr-spatial-tracking" allowfullscreen="true" style="width:100%;aspect-ratio:16/9;border:0;background:#18293A"></iframe></div></sc-if>
+          <sc-if value="{{ P.hasLink }}"><div style="display:flex;flex-direction:column;gap:16px;align-items:flex-start"><h2 style="margin:0;font-family:'Italiana';font-weight:400;font-size:34px">{{ t.video }}</h2><a href="{{ P.video }}" target="_blank" rel="noopener" style="border:1px solid #18293A;padding:14px 22px;font-size:13px;letter-spacing:0.16em;text-transform:uppercase">{{ t.openTour }}</a></div></sc-if>
+          <sc-if value="{{ P.hasMap }}"><div style="display:flex;flex-direction:column;gap:16px"><h2 style="margin:0;font-family:'Italiana';font-weight:400;font-size:34px">{{ t.location }}</h2><div ref="{{ propMapRef }}" style="height:400px;width:100%;background:#E9E1D3"></div></div></sc-if>
+        </div>
+        <aside style="flex:1 1 320px;max-width:100%;position:sticky;top:110px;display:flex;flex-direction:column;gap:0;border:1px solid #E2D8C7;background:#FFFFFF">
+          <div style="padding:28px;display:flex;flex-direction:column;gap:14px;border-bottom:1px solid #E2D8C7">
+            <div style="font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#9C7F52">{{ t.code }} {{ P.code }}</div>
+            <a href="{{ P.wa }}" target="_blank" rel="noopener" style="display:block;text-align:center;background:#18293A;color:#EEE3D0;padding:16px;font-size:13px;letter-spacing:0.16em;text-transform:uppercase" style-hover="background:#22384D;color:#EEE3D0">{{ t.whatsapp }}</a>
+          </div>
+          <div style="padding:28px;display:flex;flex-direction:column;gap:14px">
+            <div style="font-family:'Italiana';font-size:28px">{{ t.schedule }}</div>
+            <div style="font-size:14px;line-height:1.5;color:#5A6573">{{ t.scheduleLead }}</div>
+            <sc-if value="{{ okVisit }}"><div style="background:#EEE3D0;padding:16px;font-size:15px;line-height:1.5">{{ t.sent }}</div></sc-if>
+            <sc-if value="{{ formVisit }}" hint-placeholder-val="{{ true }}">
+              <input name="name" value="{{ lead.name }}" onChange="{{ onLead }}" placeholder="{{ t.name }}" style="width:100%;padding:12px 14px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none" style-focus="border-color:#9C7F52">
+              <input name="phone" value="{{ lead.phone }}" onChange="{{ onLead }}" placeholder="{{ t.phone }}" style="width:100%;padding:12px 14px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none" style-focus="border-color:#9C7F52">
+              <div style="display:flex;gap:8px"><input type="date" name="date" value="{{ lead.date }}" onChange="{{ onLead }}" style="flex:1;min-width:0;padding:12px 10px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none"><input type="time" name="time" value="{{ lead.time }}" onChange="{{ onLead }}" style="flex:1;min-width:0;padding:12px 10px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none"></div>
+              <textarea name="msg" value="{{ lead.msg }}" onChange="{{ onLead }}" placeholder="{{ t.msg }}" rows="3" style="width:100%;padding:12px 14px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none;resize:vertical"></textarea>
+              <sc-if value="{{ errVisit }}"><div style="font-size:13px;color:#A2452F">{{ t.required }}</div></sc-if>
+              <button onClick="{{ sendVisit }}" style="background:#C9AE82;color:#18293A;border:none;padding:15px;font-size:13px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;cursor:pointer" style-hover="background:#D8C29C">{{ t.schedule }}</button>
+            </sc-if>
+          </div>
+        </aside>
+      </div>
+    </section>
+  </sc-if>
+</sc-if>
+
+<sc-if value="{{ pg.nosotros }}" hint-placeholder-val="{{ false }}">
+  <section style="background:#18293A;color:#EEE3D0"><div style="max-width:1280px;margin:0 auto;padding:clamp(64px,9vw,120px) 32px;display:flex;flex-direction:column;gap:24px"><div style="font-size:12px;letter-spacing:0.3em;color:#C9AE82">{{ t.claim }}</div><h1 style="margin:0;font-family:'Italiana';font-weight:400;font-size:clamp(44px,6vw,80px)">{{ t.aboutTitle }}</h1></div></section>
+  <section style="max-width:1280px;margin:0 auto;padding:88px 32px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:48px 80px">
+    <h2 style="margin:0;font-family:'Italiana';font-weight:400;font-size:clamp(30px,3.4vw,44px);line-height:1.2">{{ t.aboutQ }}</h2>
+    <div style="display:flex;flex-direction:column;gap:20px"><sc-for list="{{ t.aboutP }}" as="para" hint-placeholder-count="4"><p style="margin:0;font-size:18px;line-height:1.75;color:#3A4655;text-wrap:pretty">{{ para }}</p></sc-for></div>
+  </section>
+  <section style="background:#EEE3D0"><div style="max-width:1280px;margin:0 auto;padding:88px 32px;display:flex;flex-direction:column;gap:36px">
+    <div style="font-size:12px;letter-spacing:0.3em;text-transform:uppercase;color:#9C7F52">{{ t.valuesTitle }}</div>
+    <div style="display:flex;flex-wrap:wrap;gap:12px 48px"><sc-for list="{{ t.values }}" as="vv" hint-placeholder-count="5"><div style="font-family:'Italiana';font-size:clamp(30px,3.6vw,48px)">{{ vv }}</div></sc-for></div>
+    <p style="margin:0;font-size:18px;line-height:1.7;max-width:820px;color:#3A4655">{{ t.personality }}</p>
+  </div></section>
+  <section style="max-width:1280px;margin:0 auto;padding:88px 32px;display:flex;flex-direction:column;gap:40px">
+    <h2 style="margin:0;font-family:'Italiana';font-weight:400;font-size:clamp(34px,4vw,52px)">{{ t.audTitle }}</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:40px"><sc-for list="{{ t.aud }}" as="au" hint-placeholder-count="4"><div style="display:flex;flex-direction:column;gap:12px;border-top:1px solid #C9AE82;padding-top:22px"><div style="font-family:'Italiana';font-size:26px">{{ au.t }}</div><div style="font-size:15px;line-height:1.65;color:#4A5563">{{ au.d }}</div></div></sc-for></div>
+  </section>
+  <section style="background:#18293A;color:#EEE3D0"><div style="max-width:1100px;margin:0 auto;padding:clamp(72px,10vw,130px) 32px;text-align:center;font-family:'Italiana';font-size:clamp(28px,3.6vw,48px);line-height:1.3;text-wrap:balance">{{ t.concept }}</div></section>
+</sc-if>
+
+<sc-if value="{{ pg.inversores }}" hint-placeholder-val="{{ false }}">
+  <section style="background:#18293A;color:#EEE3D0"><div style="max-width:1280px;margin:0 auto;padding:clamp(64px,9vw,120px) 32px;display:flex;flex-direction:column;gap:24px"><div style="font-size:12px;letter-spacing:0.3em;color:#C9AE82">{{ t.claim }}</div><h1 style="margin:0;font-family:'Italiana';font-weight:400;font-size:clamp(44px,6vw,80px)">{{ t.invTitle }}</h1><p style="margin:0;font-size:19px;line-height:1.6;max-width:720px;color:#C8CED5;font-weight:300">{{ t.invLead }}</p></div></section>
+  <section style="max-width:1280px;margin:0 auto;padding:80px 32px 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:40px"><sc-for list="{{ t.invBlocks }}" as="ib" hint-placeholder-count="2"><div style="display:flex;flex-direction:column;gap:12px;border-top:1px solid #C9AE82;padding-top:22px"><div style="font-family:'Italiana';font-size:30px">{{ ib.t }}</div><div style="font-size:16px;line-height:1.7;color:#4A5563">{{ ib.d }}</div></div></sc-for></section>
+  <section style="max-width:1280px;margin:0 auto;padding:80px 32px;display:flex;flex-direction:column;gap:32px">
+    <h2 style="margin:0;font-family:'Italiana';font-weight:400;font-size:clamp(34px,4vw,52px)">{{ t.invOpps }}</h2>
+    <sc-if value="{{ noInvest }}"><div style="font-size:17px;color:#5A6573">{{ t.invNone }}</div></sc-if>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:28px">
+      <sc-for list="{{ investCards }}" as="c" hint-placeholder-count="3">
+        <a href="{{ c.href }}" style="display:flex;flex-direction:column;background:#FFFFFF;border:1px solid #E6DDCE;color:#18293A" style-hover="border-color:#C9AE82;color:#18293A">
+          <div style="position:relative;aspect-ratio:4/3;background:repeating-linear-gradient(135deg,#E9E1D3 0 12px,#E3DACA 12px 24px);overflow:hidden">
+            <sc-if value="{{ c.hasPhoto }}"><img src="{{ c.photo }}" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></sc-if>
+            <sc-if value="{{ c.noPhoto }}"><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:monospace;font-size:12px;color:#8C8170">{{ t.noPhotos }}</div></sc-if>
+            <div style="position:absolute;top:14px;left:14px;display:flex;gap:6px"><span style="background:#18293A;color:#EEE3D0;font-size:11px;letter-spacing:0.16em;padding:6px 10px;text-transform:uppercase">{{ c.opLabel }}</span><sc-if value="{{ c.hasStatus }}"><span style="background:#C9AE82;color:#18293A;font-size:11px;letter-spacing:0.16em;padding:6px 10px;text-transform:uppercase">{{ c.statusLabel }}</span></sc-if></div>
+          </div>
+          <div style="padding:22px 22px 24px;display:flex;flex-direction:column;gap:10px">
+            <div style="font-size:12px;letter-spacing:0.16em;text-transform:uppercase;color:#9C7F52">{{ c.typeLabel }} · {{ c.barrio }}</div>
+            <div style="font-family:'Italiana';font-size:26px;line-height:1.2">{{ c.title }}</div>
+            <div style="font-size:20px;font-weight:500">{{ c.price }}</div>
+            <div style="font-size:13px;color:#5A6573;border-top:1px solid #EEE7DB;padding-top:12px;margin-top:4px">{{ c.specs }}</div>
+          </div>
+        </a>
+      </sc-for>
+    </div>
+  </section>
+  <section style="background:#EEE3D0"><div style="max-width:880px;margin:0 auto;padding:88px 32px;display:flex;flex-direction:column;gap:22px">
+    <h2 style="margin:0;font-family:'Italiana';font-weight:400;font-size:clamp(32px,3.6vw,46px)">{{ t.invForm }}</h2>
+    <sc-if value="{{ okInv }}"><div style="background:#FBF8F3;padding:20px;font-size:16px">{{ t.sent }}</div></sc-if>
+    <sc-if value="{{ formInv }}" hint-placeholder-val="{{ true }}">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px">
+        <input name="name" value="{{ lead.name }}" onChange="{{ onLead }}" placeholder="{{ t.name }}" style="width:100%;padding:14px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none">
+        <input name="phone" value="{{ lead.phone }}" onChange="{{ onLead }}" placeholder="{{ t.phone }}" style="width:100%;padding:14px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none">
+        <input name="email" value="{{ lead.email }}" onChange="{{ onLead }}" placeholder="{{ t.email }}" style="width:100%;padding:14px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none">
+        <input name="budget" value="{{ lead.budget }}" onChange="{{ onLead }}" placeholder="{{ t.budget }}" style="width:100%;padding:14px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none">
+      </div>
+      <textarea name="msg" value="{{ lead.msg }}" onChange="{{ onLead }}" placeholder="{{ t.msg }}" rows="4" style="width:100%;padding:14px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none;resize:vertical"></textarea>
+      <sc-if value="{{ errInv }}"><div style="font-size:13px;color:#A2452F">{{ t.required }}</div></sc-if>
+      <div><button onClick="{{ sendInv }}" style="background:#18293A;color:#EEE3D0;border:none;padding:16px 36px;font-size:13px;letter-spacing:0.2em;text-transform:uppercase;cursor:pointer" style-hover="background:#22384D">{{ t.send }}</button></div>
+    </sc-if>
+  </div></section>
+</sc-if>
+
+<sc-if value="{{ pg.tasar }}" hint-placeholder-val="{{ false }}">
+  <section style="max-width:1280px;margin:0 auto;padding:clamp(56px,8vw,110px) 32px;display:flex;gap:64px;flex-wrap:wrap;align-items:flex-start">
+    <div style="flex:1 1 380px;display:flex;flex-direction:column;gap:24px">
+      <h1 style="margin:0;font-family:'Italiana';font-weight:400;font-size:clamp(44px,6vw,76px);line-height:1.05">{{ t.valTitle }}</h1>
+      <p style="margin:0;font-size:19px;line-height:1.65;color:#3A4655;font-weight:300">{{ t.valLead }}</p>
+      <div style="display:flex;flex-direction:column;border-top:1px solid #E2D8C7;margin-top:12px"><sc-for list="{{ t.valPoints }}" as="vp" hint-placeholder-count="4"><div style="padding:16px 0;border-bottom:1px solid #E2D8C7;font-size:17px;display:flex;gap:14px;align-items:center"><span style="width:6px;height:6px;background:#C9AE82;flex:0 0 auto"></span>{{ vp }}</div></sc-for></div>
+    </div>
+    <div style="flex:1 1 420px;background:#FFFFFF;border:1px solid #E2D8C7;padding:36px;display:flex;flex-direction:column;gap:14px">
+      <sc-if value="{{ okValue }}"><div style="background:#EEE3D0;padding:20px;font-size:16px">{{ t.sent }}</div></sc-if>
+      <sc-if value="{{ formValue }}" hint-placeholder-val="{{ true }}">
+        <input name="name" value="{{ lead.name }}" onChange="{{ onLead }}" placeholder="{{ t.name }}" style="width:100%;padding:14px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none">
+        <div style="display:flex;gap:12px;flex-wrap:wrap"><input name="phone" value="{{ lead.phone }}" onChange="{{ onLead }}" placeholder="{{ t.phone }}" style="flex:1 1 180px;padding:14px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none"><input name="email" value="{{ lead.email }}" onChange="{{ onLead }}" placeholder="{{ t.email }}" style="flex:1 1 180px;padding:14px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none"></div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <select name="type" value="{{ lead.type }}" onChange="{{ onLead }}" style="flex:1 1 180px;padding:14px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none"><sc-for list="{{ typeOptions }}" as="o" hint-placeholder-count="1"><option value="{{ o.v }}">{{ o.label }}</option></sc-for></select>
+          <select name="barrio" value="{{ lead.barrio }}" onChange="{{ onLead }}" style="flex:1 1 180px;padding:14px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none"><sc-for list="{{ barrioOptions }}" as="o" hint-placeholder-count="1"><option value="{{ o.v }}">{{ o.label }}</option></sc-for></select>
+        </div>
+        <input type="number" name="m2" value="{{ lead.m2 }}" onChange="{{ onLead }}" placeholder="{{ t.m2 }}" style="width:100%;padding:14px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none">
+        <textarea name="msg" value="{{ lead.msg }}" onChange="{{ onLead }}" placeholder="{{ t.msg }}" rows="4" style="width:100%;padding:14px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none;resize:vertical"></textarea>
+        <sc-if value="{{ errValue }}"><div style="font-size:13px;color:#A2452F">{{ t.required }}</div></sc-if>
+        <button onClick="{{ sendValue }}" style="background:#18293A;color:#EEE3D0;border:none;padding:16px;font-size:13px;letter-spacing:0.2em;text-transform:uppercase;cursor:pointer" style-hover="background:#22384D">{{ t.send }}</button>
+      </sc-if>
+    </div>
+  </section>
+</sc-if>
+
+<sc-if value="{{ pg.contacto }}" hint-placeholder-val="{{ false }}">
+  <section style="max-width:1280px;margin:0 auto;padding:clamp(56px,8vw,110px) 32px;display:flex;gap:64px;flex-wrap:wrap;align-items:flex-start">
+    <div style="flex:1 1 380px;display:flex;flex-direction:column;gap:28px">
+      <h1 style="margin:0;font-family:'Italiana';font-weight:400;font-size:clamp(44px,6vw,76px);line-height:1.05">{{ t.contactTitle }}</h1>
+      <p style="margin:0;font-size:19px;line-height:1.65;color:#3A4655;font-weight:300">{{ t.contactLead }}</p>
+      <div style="display:flex;flex-direction:column;gap:18px;border-top:1px solid #E2D8C7;padding-top:28px">
+        <a href="{{ waGeneral }}" target="_blank" rel="noopener" style="align-self:flex-start;background:#18293A;color:#EEE3D0;padding:16px 28px;font-size:13px;letter-spacing:0.18em;text-transform:uppercase" style-hover="background:#22384D;color:#EEE3D0">WhatsApp · {{ waDisplay }}</a>
+        <a href="{{ mailHref }}" style="font-size:18px">{{ settings.email }}</a>
+        <div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#9C7F52">{{ t.zonesTitle }}</div><div style="font-size:16px;line-height:1.6;color:#3A4655">Carrasco · Carrasco Norte · Ciudad de la Costa · Malvín</div></div>
+      </div>
+    </div>
+    <div style="flex:1 1 420px;background:#FFFFFF;border:1px solid #E2D8C7;padding:36px;display:flex;flex-direction:column;gap:14px">
+      <sc-if value="{{ okContact }}"><div style="background:#EEE3D0;padding:20px;font-size:16px">{{ t.sent }}</div></sc-if>
+      <sc-if value="{{ formContact }}" hint-placeholder-val="{{ true }}">
+        <input name="name" value="{{ lead.name }}" onChange="{{ onLead }}" placeholder="{{ t.name }}" style="width:100%;padding:14px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none">
+        <div style="display:flex;gap:12px;flex-wrap:wrap"><input name="phone" value="{{ lead.phone }}" onChange="{{ onLead }}" placeholder="{{ t.phone }}" style="flex:1 1 180px;padding:14px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none"><input name="email" value="{{ lead.email }}" onChange="{{ onLead }}" placeholder="{{ t.email }}" style="flex:1 1 180px;padding:14px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none"></div>
+        <textarea name="msg" value="{{ lead.msg }}" onChange="{{ onLead }}" placeholder="{{ t.msg }}" rows="5" style="width:100%;padding:14px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none;resize:vertical"></textarea>
+        <sc-if value="{{ errContact }}"><div style="font-size:13px;color:#A2452F">{{ t.required }}</div></sc-if>
+        <button onClick="{{ sendContact }}" style="background:#18293A;color:#EEE3D0;border:none;padding:16px;font-size:13px;letter-spacing:0.2em;text-transform:uppercase;cursor:pointer" style-hover="background:#22384D">{{ t.send }}</button>
+      </sc-if>
+    </div>
+  </section>
+</sc-if>
+
+<sc-if value="{{ pg.admin }}" hint-placeholder-val="{{ false }}">
+  <div style="background:#18293A;color:#EEE3D0"><div style="max-width:1280px;margin:0 auto;padding:18px 32px;display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap">
+    <div style="display:flex;align-items:baseline;gap:18px"><span style="font-family:'Italiana';font-size:28px;letter-spacing:0.3em">ALVORA</span><span style="font-size:12px;letter-spacing:0.2em;color:#C9AE82">PANEL DE ADMINISTRACIÓN</span></div>
+    <div style="display:flex;gap:22px;font-size:13px;letter-spacing:0.12em;text-transform:uppercase"><a href="#/" style="color:#EEE3D0">Ver sitio</a><sc-if value="{{ adminOk }}"><button onClick="{{ logout }}" style="background:none;border:none;color:#C9AE82;font-size:13px;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;padding:0">Salir</button></sc-if></div>
+  </div></div>
+
+  <sc-if value="{{ adminLogin }}" hint-placeholder-val="{{ true }}">
+    <section style="max-width:440px;margin:0 auto;padding:120px 32px;display:flex;flex-direction:column;gap:16px">
+      <div style="font-family:'Italiana';font-size:38px">Ingresar</div>
+      <input type="password" value="{{ pw }}" onChange="{{ onPw }}" onKeyDown="{{ onPwKey }}" placeholder="Contraseña" style="width:100%;padding:14px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none">
+      <sc-if value="{{ pwErr }}"><div style="font-size:13px;color:#A2452F">Contraseña incorrecta.</div></sc-if>
+      <button onClick="{{ doLogin }}" style="background:#18293A;color:#EEE3D0;border:none;padding:15px;font-size:13px;letter-spacing:0.2em;text-transform:uppercase;cursor:pointer">Entrar</button>
+    </section>
+  </sc-if>
+
+  <sc-if value="{{ adminOk }}" hint-placeholder-val="{{ false }}">
+    <section style="max-width:1280px;margin:0 auto;padding:36px 32px 96px;display:flex;flex-direction:column;gap:28px">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;border-bottom:1px solid #E2D8C7;padding-bottom:20px">
+        <div style="display:flex;gap:6px;flex-wrap:wrap"><sc-for list="{{ tabs }}" as="tb" hint-placeholder-count="3"><button onClick="{{ tb.onClick }}" style="background:{{ tb.bg }};color:{{ tb.fg }};border:1px solid #18293A;padding:11px 18px;font-size:13px;letter-spacing:0.08em;cursor:pointer">{{ tb.label }}</button></sc-for></div>
+        <button onClick="{{ newProp }}" style="background:#C9AE82;color:#18293A;border:none;padding:13px 22px;font-size:13px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;cursor:pointer" style-hover="background:#D8C29C">+ Nueva publicación</button>
+      </div>
+      <sc-if value="{{ hasMsg }}"><div style="background:#EEE3D0;padding:14px 18px;font-size:14px">{{ adminMsg }}</div></sc-if>
+
+      <sc-if value="{{ tabList }}" hint-placeholder-val="{{ true }}">
+        <sc-if value="{{ noRows }}"><div style="padding:48px;border:1px solid #E2D8C7;text-align:center;color:#5A6573">Todavía no hay publicaciones.</div></sc-if>
+        <div style="display:flex;flex-direction:column;border-top:1px solid #E2D8C7">
+          <sc-for list="{{ rows }}" as="rw" hint-placeholder-count="5">
+            <div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap;padding:16px 0;border-bottom:1px solid #E2D8C7">
+              <div style="width:96px;height:72px;flex:0 0 auto;background:repeating-linear-gradient(135deg,#E9E1D3 0 8px,#E3DACA 8px 16px);overflow:hidden"><sc-if value="{{ rw.hasThumb }}"><img src="{{ rw.thumb }}" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></sc-if></div>
+              <div style="flex:1 1 260px;min-width:0;display:flex;flex-direction:column;gap:4px"><div style="font-size:11px;letter-spacing:0.16em;color:#9C7F52">{{ rw.code }} · {{ rw.nPhotos }}</div><a href="{{ rw.href }}" style="font-family:'Italiana';font-size:22px">{{ rw.title }}</a><div style="font-size:13px;color:#5A6573">{{ rw.meta }}</div></div>
+              <div style="flex:0 0 160px;font-size:16px;font-weight:500">{{ rw.price }}</div>
+              <select value="{{ rw.status }}" onChange="{{ rw.onStatus }}" style="flex:0 0 140px;padding:10px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none"><sc-for list="{{ statusOptions }}" as="o" hint-placeholder-count="5"><option value="{{ o.v }}">{{ o.label }}</option></sc-for></select>
+              <div style="display:flex;gap:6px">
+                <button onClick="{{ rw.onFeat }}" style="background:{{ rw.featBg }};color:#18293A;border:1px solid #C9AE82;padding:9px 12px;font-size:12px;cursor:pointer">{{ rw.featLabel }}</button>
+                <button onClick="{{ rw.onEdit }}" style="background:#18293A;color:#EEE3D0;border:1px solid #18293A;padding:9px 14px;font-size:12px;cursor:pointer">Editar</button>
+                <button onClick="{{ rw.onDelete }}" style="background:#FFFFFF;color:#A2452F;border:1px solid #D9CFBF;padding:9px 12px;font-size:12px;cursor:pointer">Eliminar</button>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ tabEdit }}" hint-placeholder-val="{{ false }}">
+        <div style="font-family:'Italiana';font-size:40px">{{ formTitle }}</div>
+        <div style="display:flex;flex-direction:column;gap:36px">
+          <div style="display:flex;flex-direction:column;gap:16px"><div style="font-size:12px;letter-spacing:0.2em;text-transform:uppercase;color:#9C7F52;border-bottom:1px solid #E2D8C7;padding-bottom:10px">Textos</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:18px">
+              <label style="display:flex;flex-direction:column;gap:8px;font-size:12px;letter-spacing:0.1em;color:#5A6573">TÍTULO (ES) *<input name="title_es" value="{{ form.title_es }}" onChange="{{ onField }}" style="width:100%;padding:12px 14px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none;font-size:15px;letter-spacing:0"></label>
+              <label style="display:flex;flex-direction:column;gap:8px;font-size:12px;letter-spacing:0.1em;color:#5A6573">TÍTULO (EN)<input name="title_en" value="{{ form.title_en }}" onChange="{{ onField }}" style="width:100%;padding:12px 14px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none;font-size:15px;letter-spacing:0"></label>
+              <label style="display:flex;flex-direction:column;gap:8px;font-size:12px;letter-spacing:0.1em;color:#5A6573">DESCRIPCIÓN (ES)<textarea name="desc_es" value="{{ form.desc_es }}" onChange="{{ onField }}" rows="6" style="width:100%;padding:12px 14px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none;resize:vertical;font-size:15px;letter-spacing:0;line-height:1.5"></textarea></label>
+              <label style="display:flex;flex-direction:column;gap:8px;font-size:12px;letter-spacing:0.1em;color:#5A6573">DESCRIPCIÓN (EN)<textarea name="desc_en" value="{{ form.desc_en }}" onChange="{{ onField }}" rows="6" style="width:100%;padding:12px 14px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none;resize:vertical;font-size:15px;letter-spacing:0;line-height:1.5"></textarea></label>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:16px"><div style="font-size:12px;letter-spacing:0.2em;text-transform:uppercase;color:#9C7F52;border-bottom:1px solid #E2D8C7;padding-bottom:10px">Operación, precio y superficie</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:18px">
+              <label style="display:flex;flex-direction:column;gap:8px;font-size:12px;letter-spacing:0.1em;color:#5A6573">OPERACIÓN<select name="op" value="{{ form.op }}" onChange="{{ onField }}" style="width:100%;padding:12px 14px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none"><option value="venta">Venta</option><option value="alquiler">Alquiler</option></select></label>
+              <label style="display:flex;flex-direction:column;gap:8px;font-size:12px;letter-spacing:0.1em;color:#5A6573">TIPO<select name="type" value="{{ form.type }}" onChange="{{ onField }}" style="width:100%;padding:12px 14px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none"><sc-for list="{{ typeOptionsA }}" as="o" hint-placeholder-count="5"><option value="{{ o.v }}">{{ o.label }}</option></sc-for></select></label>
+              <label style="display:flex;flex-direction:column;gap:8px;font-size:12px;letter-spacing:0.1em;color:#5A6573">PRECIO *<input type="number" name="price" value="{{ form.price }}" onChange="{{ onField }}" style="width:100%;padding:12px 14px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none"></label>
+              <label style="display:flex;flex-direction:column;gap:8px;font-size:12px;letter-spacing:0.1em;color:#5A6573">MONEDA<select name="currency" value="{{ form.currency }}" onChange="{{ onField }}" style="width:100%;padding:12px 14px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none"><option value="USD">USD</option><option value="UYU">UYU ($)</option></select></label>
+              <label style="display:flex;flex-direction:column;gap:8px;font-size:12px;letter-spacing:0.1em;color:#5A6573">M² TOTALES<input type="number" name="m2tot" value="{{ form.m2tot }}" onChange="{{ onField }}" style="width:100%;padding:12px 14px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none"></label>
+              <label style="display:flex;flex-direction:column;gap:8px;font-size:12px;letter-spacing:0.1em;color:#5A6573">M² EDIFICADOS<input type="number" name="m2edif" value="{{ form.m2edif }}" onChange="{{ onField }}" style="width:100%;padding:12px 14px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none"></label>
+              <label style="display:flex;flex-direction:column;gap:8px;font-size:12px;letter-spacing:0.1em;color:#5A6573">GASTOS COMUNES ($/MES)<input type="number" name="gastos" value="{{ form.gastos }}" onChange="{{ onField }}" style="width:100%;padding:12px 14px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none"></label>
+              <label style="display:flex;flex-direction:column;gap:8px;font-size:12px;letter-spacing:0.1em;color:#5A6573">AÑO DE CONSTRUCCIÓN<input type="number" name="anio" value="{{ form.anio }}" onChange="{{ onField }}" style="width:100%;padding:12px 14px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none"></label>
+              <label style="display:flex;flex-direction:column;gap:8px;font-size:12px;letter-spacing:0.1em;color:#5A6573">DORMITORIOS<input type="number" name="dorm" value="{{ form.dorm }}" onChange="{{ onField }}" style="width:100%;padding:12px 14px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none"></label>
+              <label style="display:flex;flex-direction:column;gap:8px;font-size:12px;letter-spacing:0.1em;color:#5A6573">BAÑOS<input type="number" name="banos" value="{{ form.banos }}" onChange="{{ onField }}" style="width:100%;padding:12px 14px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none"></label>
+              <label style="display:flex;flex-direction:column;gap:8px;font-size:12px;letter-spacing:0.1em;color:#5A6573">GARAJES<input type="number" name="garaje" value="{{ form.garaje }}" onChange="{{ onField }}" style="width:100%;padding:12px 14px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none"></label>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px"><div style="font-size:12px;letter-spacing:0.1em;color:#5A6573">AMENITIES</div><div style="display:flex;gap:6px;flex-wrap:wrap"><sc-for list="{{ formAmen }}" as="o" hint-placeholder-count="6"><button onClick="{{ o.onClick }}" style="background:{{ o.bg }};color:{{ o.fg }};border:1px solid #CFC3AE;padding:8px 13px;font-size:13px;cursor:pointer">{{ o.label }}</button></sc-for></div></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:16px"><div style="font-size:12px;letter-spacing:0.2em;text-transform:uppercase;color:#9C7F52;border-bottom:1px solid #E2D8C7;padding-bottom:10px">Ubicación</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px">
+              <label style="display:flex;flex-direction:column;gap:8px;font-size:12px;letter-spacing:0.1em;color:#5A6573">BARRIO<select name="barrio" value="{{ form.barrio }}" onChange="{{ onField }}" style="width:100%;padding:12px 14px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none"><sc-for list="{{ barrioOptionsA }}" as="o" hint-placeholder-count="1"><option value="{{ o.v }}">{{ o.label }}</option></sc-for></select></label>
+              <label style="display:flex;flex-direction:column;gap:8px;font-size:12px;letter-spacing:0.1em;color:#5A6573">DIRECCIÓN O REFERENCIA (PÚBLICA)<input name="address" value="{{ form.address }}" onChange="{{ onField }}" style="width:100%;padding:12px 14px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none;font-size:15px;letter-spacing:0"></label>
+            </div>
+            <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:13px;color:#5A6573"><div>Hacé clic en el mapa para marcar la ubicación. Lat {{ form.lat }} · Lng {{ form.lng }}</div><button onClick="{{ clearLoc }}" style="background:none;border:none;color:#9C7F52;font-size:13px;cursor:pointer;padding:0">Quitar ubicación</button></div>
+            <div ref="{{ adminMapRef }}" style="height:380px;width:100%;background:#E9E1D3"></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:16px"><div style="font-size:12px;letter-spacing:0.2em;text-transform:uppercase;color:#9C7F52;border-bottom:1px solid #E2D8C7;padding-bottom:10px">Fotos y video</div>
+            <div style="font-size:13px;color:#5A6573">La primera foto es la portada. Se redimensionan automáticamente a 1600 px.</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px">
+              <sc-for list="{{ formPhotos }}" as="ph" hint-placeholder-count="0">
+                <div style="display:flex;flex-direction:column;gap:6px"><div style="position:relative;aspect-ratio:4/3;overflow:hidden;background:#E9E1D3"><img src="{{ ph.src }}" alt="" style="width:100%;height:100%;object-fit:cover;display:block"><sc-if value="{{ ph.isCover }}"><span style="position:absolute;top:8px;left:8px;background:#C9AE82;color:#18293A;font-size:10px;letter-spacing:0.14em;padding:4px 7px">PORTADA</span></sc-if></div>
+                  <div style="display:flex;gap:6px"><sc-if value="{{ ph.notCover }}"><button onClick="{{ ph.onCover }}" style="flex:1;background:#FFFFFF;border:1px solid #D9CFBF;padding:6px;font-size:12px;cursor:pointer">Portada</button></sc-if><button onClick="{{ ph.onRemove }}" style="flex:1;background:#FFFFFF;color:#A2452F;border:1px solid #D9CFBF;padding:6px;font-size:12px;cursor:pointer">Quitar</button></div></div>
+              </sc-for>
+              <label style="aspect-ratio:4/3;border:1px dashed #9C7F52;display:flex;align-items:center;justify-content:center;text-align:center;font-size:13px;color:#9C7F52;cursor:pointer;padding:12px">+ Agregar fotos<input type="file" accept="image/*" multiple="multiple" onChange="{{ onPhotos }}" style="display:none"></label>
+            </div>
+            <label style="display:flex;flex-direction:column;gap:8px;font-size:12px;letter-spacing:0.1em;color:#5A6573">VIDEO / TOUR 360 (YOUTUBE, VIMEO, MATTERPORT O LINK)<input name="video" value="{{ form.video }}" onChange="{{ onField }}" placeholder="https://" style="width:100%;padding:12px 14px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none;font-size:15px;letter-spacing:0"></label>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:16px"><div style="font-size:12px;letter-spacing:0.2em;text-transform:uppercase;color:#9C7F52;border-bottom:1px solid #E2D8C7;padding-bottom:10px">Publicación</div>
+            <div style="display:flex;gap:28px;flex-wrap:wrap;align-items:center">
+              <label style="display:flex;gap:10px;align-items:center;font-size:14px">Estado<select name="status" value="{{ form.status }}" onChange="{{ onField }}" style="padding:10px 12px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none"><sc-for list="{{ statusOptions }}" as="o" hint-placeholder-count="5"><option value="{{ o.v }}">{{ o.label }}</option></sc-for></select></label>
+              <label style="display:flex;gap:10px;align-items:center;font-size:14px;cursor:pointer"><input type="checkbox" name="featured" checked="{{ form.featured }}" onChange="{{ onField }}" style="width:18px;height:18px;accent-color:#18293A">Destacada en inicio</label>
+              <label style="display:flex;gap:10px;align-items:center;font-size:14px;cursor:pointer"><input type="checkbox" name="investment" checked="{{ form.investment }}" onChange="{{ onField }}" style="width:18px;height:18px;accent-color:#18293A">Oportunidad de inversión</label>
+            </div>
+          </div>
+          <div style="display:flex;gap:12px;border-top:1px solid #E2D8C7;padding-top:24px">
+            <button onClick="{{ saveForm }}" style="background:#18293A;color:#EEE3D0;border:none;padding:16px 34px;font-size:13px;letter-spacing:0.2em;text-transform:uppercase;cursor:pointer" style-hover="background:#22384D">Guardar</button>
+            <button onClick="{{ cancelForm }}" style="background:#FFFFFF;color:#18293A;border:1px solid #D9CFBF;padding:16px 28px;font-size:13px;letter-spacing:0.2em;text-transform:uppercase;cursor:pointer">Cancelar</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ tabLeads }}" hint-placeholder-val="{{ false }}">
+        <sc-if value="{{ noLeads }}"><div style="padding:48px;border:1px solid #E2D8C7;text-align:center;color:#5A6573">Todavía no hay consultas. Llegan desde Agendar visita, Tasá tu propiedad, Inversores y Contacto.</div></sc-if>
+        <div style="display:flex;flex-direction:column;border-top:1px solid #E2D8C7">
+          <sc-for list="{{ leadRows }}" as="ld" hint-placeholder-count="3">
+            <div style="display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;padding:18px 0;border-bottom:1px solid #E2D8C7">
+              <div style="flex:0 0 110px;display:flex;flex-direction:column;gap:6px"><span style="align-self:flex-start;background:#EEE3D0;font-size:11px;letter-spacing:0.14em;padding:5px 8px;text-transform:uppercase">{{ ld.kind }}</span><span style="font-size:12px;color:#5A6573">{{ ld.when }}</span></div>
+              <div style="flex:1 1 320px;min-width:0;display:flex;flex-direction:column;gap:5px"><div style="font-size:17px;font-weight:500">{{ ld.name }} · {{ ld.phone }}</div><div style="font-size:13px;color:#5A6573">{{ ld.det }}</div><sc-if value="{{ ld.hasMsg }}"><div style="font-size:14px;line-height:1.5;color:#3A4655">{{ ld.msg }}</div></sc-if></div>
+              <div style="display:flex;gap:6px"><a href="{{ ld.wa }}" target="_blank" rel="noopener" style="background:#18293A;color:#EEE3D0;padding:9px 14px;font-size:12px">Responder por WhatsApp</a><button onClick="{{ ld.onDelete }}" style="background:#FFFFFF;color:#A2452F;border:1px solid #D9CFBF;padding:9px 12px;font-size:12px;cursor:pointer">Eliminar</button></div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ tabSettings }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;max-width:900px">
+          <label style="display:flex;flex-direction:column;gap:8px;font-size:12px;letter-spacing:0.1em;color:#5A6573">WHATSAPP (CON CÓDIGO DE PAÍS)<input name="whatsapp" value="{{ sd.whatsapp }}" onChange="{{ onSd }}" placeholder="598 99 123 456" style="width:100%;padding:12px 14px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none;font-size:15px;letter-spacing:0"></label>
+          <label style="display:flex;flex-direction:column;gap:8px;font-size:12px;letter-spacing:0.1em;color:#5A6573">EMAIL DE CONTACTO<input name="email" value="{{ sd.email }}" onChange="{{ onSd }}" style="width:100%;padding:12px 14px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none;font-size:15px;letter-spacing:0"></label>
+          <label style="display:flex;flex-direction:column;gap:8px;font-size:12px;letter-spacing:0.1em;color:#5A6573">COTIZACIÓN (1 USD = $ UYU)<input type="number" name="rate" value="{{ sd.rate }}" onChange="{{ onSd }}" style="width:100%;padding:12px 14px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none"></label>
+          <label style="display:flex;flex-direction:column;gap:8px;font-size:12px;letter-spacing:0.1em;color:#5A6573">CONTRASEÑA DEL PANEL<input name="password" value="{{ sd.password }}" onChange="{{ onSd }}" style="width:100%;padding:12px 14px;border:1px solid #D9CFBF;background:#FFFFFF;color:#18293A;outline:none;font-size:15px;letter-spacing:0"></label>
+        </div>
+        <div><button onClick="{{ saveSettings }}" style="background:#18293A;color:#EEE3D0;border:none;padding:15px 30px;font-size:13px;letter-spacing:0.2em;text-transform:uppercase;cursor:pointer">Guardar ajustes</button></div>
+        <div style="display:flex;flex-direction:column;gap:14px;border-top:1px solid #E2D8C7;padding-top:24px;max-width:900px">
+          <div style="font-size:12px;letter-spacing:0.2em;text-transform:uppercase;color:#9C7F52">Respaldo de datos</div>
+          <div style="font-size:14px;line-height:1.6;color:#3A4655">Por ahora las publicaciones y consultas se guardan en este navegador. Exportá un respaldo con regularidad.</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button onClick="{{ exportData }}" style="background:#FFFFFF;color:#18293A;border:1px solid #18293A;padding:12px 18px;font-size:13px;cursor:pointer">Exportar respaldo (.json)</button>
+            <label style="background:#FFFFFF;color:#18293A;border:1px solid #18293A;padding:12px 18px;font-size:13px;cursor:pointer">Importar respaldo<input type="file" accept="application/json,.json" onChange="{{ importData }}" style="display:none"></label>
+            <button onClick="{{ resetDemo }}" style="background:#FFFFFF;color:#A2452F;border:1px solid #D9CFBF;padding:12px 18px;font-size:13px;cursor:pointer">Restaurar datos de ejemplo</button>
+          </div>
+        </div>
+      </sc-if>
+    </section>
+  </sc-if>
+</sc-if>
+
+</main>
+
+<sc-if value="{{ isPublic }}" hint-placeholder-val="{{ true }}">
+<footer style="background:#18293A;color:#EEE3D0">
+  <div style="max-width:1280px;margin:0 auto;padding:72px 32px 40px;display:flex;flex-direction:column;gap:48px">
+    <div style="display:flex;justify-content:space-between;gap:40px;flex-wrap:wrap">
+      <div style="display:flex;flex-direction:column;gap:10px"><div style="display:flex;flex-direction:column;align-items:stretch;gap:12px"><div style="font-family:'Italiana';font-size:44px;letter-spacing:0.3em;line-height:1">ALVOR<span style="letter-spacing:0">A</span></div><div style="display:flex;justify-content:space-between;font-family:'Raleway';font-size:11px;line-height:1;color:#C9AE82"><span>C</span><span>O</span><span>N</span><span>E</span><span>C</span><span>T</span><span>A</span><span>N</span><span>D</span><span>O</span><span style="width:0.5em"></span><span>O</span><span>P</span><span>O</span><span>R</span><span>T</span><span>U</span><span>N</span><span>I</span><span>D</span><span>A</span><span>D</span><span>E</span><span>S</span></div></div></div>
+      <div style="display:flex;gap:56px;flex-wrap:wrap">
+        <div style="display:flex;flex-direction:column;gap:10px"><sc-for list="{{ nav }}" as="n" hint-placeholder-count="6"><a href="{{ n.href }}" style="color:#EEE3D0;font-size:14px" style-hover="color:#C9AE82">{{ n.label }}</a></sc-for></div>
+        <div style="display:flex;flex-direction:column;gap:10px;font-size:14px;color:#C8CED5"><a href="{{ waGeneral }}" target="_blank" rel="noopener" style="color:#EEE3D0">WhatsApp · {{ waDisplay }}</a><a href="{{ mailHref }}" style="color:#EEE3D0">{{ settings.email }}</a><div>Montevideo · Uruguay</div></div>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;border-top:1px solid #2C3E51;padding-top:24px;font-size:12px;color:#8FA0B2"><div>© 2026 ALVORA</div><a href="#/admin" style="color:#8FA0B2">{{ t.footerAdmin }}</a></div>
+  </div>
+</footer>
+<a href="{{ waGeneral }}" target="_blank" rel="noopener" style="position:fixed;right:24px;bottom:24px;z-index:2500;background:#C9AE82;color:#18293A;padding:14px 22px;font-size:12px;font-weight:600;letter-spacing:0.18em;box-shadow:0 8px 24px rgba(24,41,58,0.3)" style-hover="background:#D8C29C;color:#18293A">WHATSAPP</a>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  TYPES = ['casa','apartamento','terreno','local','oficina'];
+  AMEN = ['piscina','parrillero','jardin','terraza','vista','gimnasio','seguridad','ascensor','calefaccion','lavadero'];
+  STATUS = ['publicada','reservada','vendida','alquilada','borrador'];
+  FOCUS = ['Carrasco','Carrasco Norte','Ciudad de la Costa','Malvín'];
+  B = ['Aguada','Aires Puros','Atahualpa','Bañados de Carrasco','Barrio Sur','Bella Vista','Belvedere','Brazo Oriental','Buceo','Capurro / Bella Vista','Carrasco','Carrasco Norte','Casabó / Pajas Blancas','Casavalle','Cerrito de la Victoria','Cerro','Centro','Ciudad Vieja','Colón','Conciliación','Cordón','Flor de Maroñas','Ituzaingó','Jacinto Vera','Jardines del Hipódromo','La Blanqueada','La Comercial','La Figurita','La Teja','Larrañaga','Las Acacias','Las Canteras','Lezica / Melilla','Malvín','Malvín Norte','Manga','Maroñas','Mercado Modelo','Nuevo París','Palermo','Parque Batlle','Parque Rodó','Paso de la Arena','Paso de las Duranas','Peñarol','Piedras Blancas','Pocitos','Prado','Punta Carretas','Punta Gorda','Punta de Rieles','Reducto','Sayago','Tres Cruces','Tres Ombúes','Unión','Villa Española','Villa García','Villa Muñoz','Ciudad de la Costa'].sort((a,b)=>a.localeCompare(b,'es'));
+  listMapRef = React.createRef(); propMapRef = React.createRef(); adminMapRef = React.createRef();
+  maps = {};
+  T = {
+    es: {
+      nav:{home:'Inicio',props:'Propiedades',about:'Nosotros',inv:'Inversores',value:'Tasá tu propiedad',contact:'Contacto'},
+      claim:'CONECTANDO OPORTUNIDADES',
+      heroEyebrow:'Cada propiedad, una oportunidad',
+      heroTitle:'Conectamos personas, propiedades y oportunidades.',
+      heroSub:'Una visión estratégica del mercado con una gestión comercial activa y cercana.',
+      search:'Buscar', opAny:'Venta o alquiler', all:'Todas', any:'Todos', venta:'Venta', alquiler:'Alquiler',
+      types:{casa:'Casa',apartamento:'Apartamento',terreno:'Terreno',local:'Local comercial',oficina:'Oficina'},
+      amen:{piscina:'Piscina',parrillero:'Parrillero',jardin:'Jardín',terraza:'Terraza',vista:'Vista al mar',gimnasio:'Gimnasio',seguridad:'Seguridad 24 h',ascensor:'Ascensor',calefaccion:'Calefacción',lavadero:'Lavadero'},
+      status:{publicada:'Publicada',reservada:'Reservada',vendida:'Vendida',alquilada:'Alquilada',borrador:'Borrador'},
+      featured:'Propiedades destacadas', viewAll:'Ver todas',
+      whatTitle:'Qué hacemos', whatLead:'Intermediación en la compra y venta de propiedades.',
+      svc:[{t:'Propiedades residenciales',d:'Casas y apartamentos.'},{t:'Terrenos',d:'Lotes, terrenos para desarrollar y oportunidades de valorización.'},{t:'Propiedades comerciales',d:'Locales, oficinas y otros activos destinados a actividades empresariales.'},{t:'Oportunidades de inversión',d:'Propiedades que puedan resultar atractivas por su ubicación, características, precio o potencial de desarrollo.'}],
+      zonesTitle:'Zonas', zonesLead:'Nuestro foco está en Carrasco, Carrasco Norte, Ciudad de la Costa y Malvín.',
+      sellTitle:'¿Querés vender tu propiedad?', sellText:'Gestión profesional, una buena presentación y acceso a potenciales compradores.', sellCta:'Tasá tu propiedad',
+      propsTitle:'Propiedades', prop1:'propiedad', propN:'propiedades',
+      filters:'Filtros', clear:'Limpiar', operation:'Operación', type:'Tipo', barrio:'Barrio', anyType:'Todos los tipos', anyBarrio:'Todos los barrios', price:'Precio', min:'Mín.', max:'Máx.', surface:'Superficie (m²)', m2totShort:'Totales', m2edifShort:'Edificados', dorm:'Dormitorios', banos:'Baños', withGarage:'Con garaje', amenities:'Piscina y amenities',
+      sortRecent:'Más recientes', sortLow:'Menor precio', sortHigh:'Mayor precio', sortM2:'Mayor superficie', viewGrid:'Lista', viewMap:'Mapa', noResults:'No hay propiedades con estos filtros.',
+      dormShort:'dorm.', banosShort:'baños', garajeShort:'garaje', perMonth:'/mes',
+      back:'Volver a propiedades', code:'Código', m2tot:'Superficie total', m2edif:'Superficie edificada', garaje:'Garaje', gastos:'Gastos comunes', anio:'Año de construcción', description:'Descripción', amenTitle:'Amenities', location:'Ubicación', video:'Video / tour 360', openTour:'Abrir tour', published:'Precio publicado', whatsapp:'Consultar por WhatsApp', schedule:'Agendar visita', scheduleLead:'Elegí día y horario. Te confirmamos por WhatsApp.', waMsg:'Hola ALVORA, quiero consultar por la propiedad', waHello:'Hola ALVORA, quiero hacer una consulta.', notFound:'No encontramos esta propiedad.', noPhotos:'foto de propiedad',
+      name:'Nombre', phone:'Teléfono', email:'Email', msg:'Mensaje', send:'Enviar', sent:'Gracias. Te contactamos a la brevedad.', required:'Completá nombre y teléfono.', m2:'Metros cuadrados aproximados', budget:'Presupuesto aproximado',
+      aboutTitle:'Nosotros', aboutQ:'¿Qué es ALVORA?',
+      aboutP:['ALVORA es una firma orientada al mercado inmobiliario, la identificación de oportunidades de inversión y el desarrollo de negocios vinculados a activos inmobiliarios.','Nace con la idea de conectar personas, propiedades y oportunidades comerciales, combinando una visión estratégica del mercado con una gestión comercial activa y cercana.','Su enfoque no se limita a la intermediación tradicional. Busca identificar oportunidades, comprender las necesidades de cada parte y generar conexiones que faciliten operaciones de valor para propietarios, compradores e inversores.','ALVORA aspira a construir una marca sólida, profesional y confiable, con una identidad propia y capacidad de crecimiento a largo plazo.'],
+      valuesTitle:'Lo que transmitimos', values:['Confianza','Profesionalismo','Criterio comercial','Discreción','Visión de futuro'],
+      personality:'Una empresa que entiende el valor de las relaciones y sabe reconocer el potencial de cada oportunidad.',
+      audTitle:'A quién nos dirigimos',
+      aud:[{t:'Propietarios que quieren vender',d:'Personas y empresas que buscan comercializar una propiedad y valoran una gestión profesional, una buena presentación y acceso a potenciales compradores.'},{t:'Compradores particulares',d:'Personas que buscan una vivienda para vivir, cambiar de casa o adquirir una segunda propiedad.'},{t:'Inversores',d:'Personas que buscan oportunidades para preservar o hacer crecer su capital mediante la adquisición de propiedades, terrenos u otros activos inmobiliarios.'},{t:'Empresas y desarrolladores',d:'Organizaciones que necesitan comprar, vender o identificar propiedades y terrenos para desarrollar proyectos, instalar operaciones o detectar oportunidades comerciales.'}],
+      concept:'ALVORA no busca ser solamente una empresa que comercializa propiedades, sino una firma que conecta personas, activos y oportunidades para generar valor.',
+      invTitle:'Inversores', invLead:'Identificamos propiedades que puedan resultar atractivas por su ubicación, características, precio o potencial de desarrollo.',
+      invBlocks:[{t:'Inversores',d:'Personas que buscan oportunidades para preservar o hacer crecer su capital mediante la adquisición de propiedades, terrenos u otros activos inmobiliarios.'},{t:'Empresas y desarrolladores',d:'Organizaciones que necesitan comprar, vender o identificar propiedades y terrenos para desarrollar proyectos, instalar operaciones o detectar oportunidades comerciales.'}],
+      invOpps:'Oportunidades actuales', invForm:'Contanos qué estás buscando', invNone:'Pronto publicaremos nuevas oportunidades.',
+      valTitle:'Tasá tu propiedad', valLead:'Contanos sobre tu propiedad y coordinamos una visita para evaluarla.', valPoints:['Gestión profesional','Presentación comercial cuidada','Acceso a compradores e inversores','Acompañamiento en la negociación'],
+      contactTitle:'Contacto', contactLead:'Escribinos por WhatsApp o dejanos tus datos y te contactamos.', footerAdmin:'Administración'
+    },
+    en: {
+      nav:{home:'Home',props:'Properties',about:'About',inv:'Investors',value:'Value your property',contact:'Contact'},
+      claim:'CONNECTING OPPORTUNITIES',
+      heroEyebrow:'Every property, an opportunity',
+      heroTitle:'We connect people, properties and opportunities.',
+      heroSub:'A strategic view of the market with active, hands-on commercial management.',
+      search:'Search', opAny:'Sale or rent', all:'All', any:'Any', venta:'Sale', alquiler:'Rent',
+      types:{casa:'House',apartamento:'Apartment',terreno:'Land',local:'Retail unit',oficina:'Office'},
+      amen:{piscina:'Pool',parrillero:'BBQ area',jardin:'Garden',terraza:'Terrace',vista:'Sea view',gimnasio:'Gym',seguridad:'24 h security',ascensor:'Elevator',calefaccion:'Heating',lavadero:'Laundry'},
+      status:{publicada:'Published',reservada:'Reserved',vendida:'Sold',alquilada:'Rented',borrador:'Draft'},
+      featured:'Featured properties', viewAll:'View all',
+      whatTitle:'What we do', whatLead:'Brokerage for the purchase and sale of properties.',
+      svc:[{t:'Residential properties',d:'Houses and apartments.'},{t:'Land',d:'Lots, development land and appreciation opportunities.'},{t:'Commercial properties',d:'Retail units, offices and other business assets.'},{t:'Investment opportunities',d:'Properties that stand out for their location, features, price or development potential.'}],
+      zonesTitle:'Areas', zonesLead:'We focus on Carrasco, Carrasco Norte, Ciudad de la Costa and Malvín.',
+      sellTitle:'Thinking of selling?', sellText:'Professional management, careful presentation and access to potential buyers.', sellCta:'Value your property',
+      propsTitle:'Properties', prop1:'property', propN:'properties',
+      filters:'Filters', clear:'Clear', operation:'Operation', type:'Type', barrio:'Neighborhood', anyType:'All types', anyBarrio:'All neighborhoods', price:'Price', min:'Min', max:'Max', surface:'Area (m²)', m2totShort:'Total', m2edifShort:'Built', dorm:'Bedrooms', banos:'Bathrooms', withGarage:'With garage', amenities:'Pool & amenities',
+      sortRecent:'Newest', sortLow:'Lowest price', sortHigh:'Highest price', sortM2:'Largest area', viewGrid:'List', viewMap:'Map', noResults:'No properties match these filters.',
+      dormShort:'bed', banosShort:'bath', garajeShort:'garage', perMonth:'/mo',
+      back:'Back to properties', code:'Ref.', m2tot:'Total area', m2edif:'Built area', garaje:'Garage', gastos:'HOA fees', anio:'Year built', description:'Description', amenTitle:'Amenities', location:'Location', video:'Video / 360 tour', openTour:'Open tour', published:'Listed price', whatsapp:'Ask on WhatsApp', schedule:'Book a visit', scheduleLead:'Pick a day and time. We will confirm on WhatsApp.', waMsg:'Hi ALVORA, I would like to ask about property', waHello:'Hi ALVORA, I have a question.', notFound:'We could not find this property.', noPhotos:'property photo',
+      name:'Name', phone:'Phone', email:'Email', msg:'Message', send:'Send', sent:'Thank you. We will be in touch shortly.', required:'Please fill in name and phone.', m2:'Approximate square meters', budget:'Approximate budget',
+      aboutTitle:'About', aboutQ:'What is ALVORA?',
+      aboutP:['ALVORA is a firm focused on the real estate market, identifying investment opportunities and developing business linked to real estate assets.','It was founded to connect people, properties and business opportunities, combining a strategic view of the market with active, hands-on commercial management.','Its approach goes beyond traditional brokerage. It seeks to identify opportunities, understand the needs of each party and create connections that lead to valuable transactions for owners, buyers and investors.','ALVORA aims to build a solid, professional and trustworthy brand, with its own identity and long-term growth potential.'],
+      valuesTitle:'What we stand for', values:['Trust','Professionalism','Commercial judgment','Discretion','Vision'],
+      personality:'A company that understands the value of relationships and recognizes the potential of every opportunity.',
+      audTitle:'Who we work with',
+      aud:[{t:'Owners who want to sell',d:'People and companies looking to market a property who value professional management, careful presentation and access to potential buyers.'},{t:'Private buyers',d:'People looking for a home to live in, to move, or to buy a second property.'},{t:'Investors',d:'People looking for opportunities to preserve or grow their capital by acquiring properties, land or other real estate assets.'},{t:'Companies and developers',d:'Organizations that need to buy, sell or identify properties and land to develop projects, set up operations or spot business opportunities.'}],
+      concept:'ALVORA aims to be more than a company that sells properties: a firm that connects people, assets and opportunities to create value.',
+      invTitle:'Investors', invLead:'We identify properties that stand out for their location, features, price or development potential.',
+      invBlocks:[{t:'Investors',d:'People looking for opportunities to preserve or grow their capital by acquiring properties, land or other real estate assets.'},{t:'Companies and developers',d:'Organizations that need to buy, sell or identify properties and land to develop projects, set up operations or spot business opportunities.'}],
+      invOpps:'Current opportunities', invForm:'Tell us what you are looking for', invNone:'New opportunities coming soon.',
+      valTitle:'Value your property', valLead:'Tell us about your property and we will arrange a visit to assess it.', valPoints:['Professional management','Careful commercial presentation','Access to buyers and investors','Support throughout the negotiation'],
+      contactTitle:'Contact', contactLead:'Message us on WhatsApp or leave your details and we will get back to you.', footerAdmin:'Admin'
+    }
+  };
+  emptyF(){ return {op:'',type:'',barrio:'',pmin:'',pmax:'',mmin:'',mmax:'',mbase:'tot',dorm:0,banos:0,garaje:false,amen:[],sort:'recent'}; }
+  emptyLead(){ return {name:'',phone:'',email:'',msg:'',barrio:'',type:'',m2:'',budget:'',date:'',time:''}; }
+  defSettings(){ return {whatsapp:'59800000000',email:'contacto@alvora.com.uy',rate:40,password:'alvora2026'}; }
+  parse(){ const h=(window.location.hash||'').replace(/^#\/?/,''); const p=h.split('/').filter(Boolean); return {page:p[0]||'inicio', id:p[1]?decodeURIComponent(p[1]):null}; }
+  state = { route:this.parse(), lang:'es', cur:'USD', props:[], leads:[], settings:this.defSettings(), f:this.emptyF(), view:'grid', qs:{op:'',type:'',barrio:''}, gIdx:0, lead:this.emptyLead(), leadOk:'', leadErr:'', admin:sessionStorage.getItem('alvora-admin')==='1', pw:'', pwErr:false, tab:'list', form:null, sd:null, adminMsg:'' };
+
+  seed(){
+    const d=[
+      {op:'venta',type:'casa',barrio:'Carrasco',price:690000,currency:'USD',m2tot:900,m2edif:320,dorm:4,banos:3,garaje:2,anio:1998,amen:['piscina','parrillero','jardin','seguridad'],featured:true,lat:-34.8845,lng:-56.0560,address:'Carrasco, Montevideo',title:{es:'Casa con jardín y piscina',en:'House with garden and pool'},desc:{es:'Casa en dos plantas sobre un terreno de 900 m², a pocas cuadras de la rambla. Living con estufa, cocina integrada y parque con piscina.\n\nCuatro dormitorios, tres baños y garaje para dos autos.',en:'Two-storey house on a 900 m² lot, a few blocks from the waterfront. Living room with fireplace, open kitchen and garden with pool.\n\nFour bedrooms, three bathrooms and a two-car garage.'}},
+      {op:'venta',type:'terreno',barrio:'Carrasco Norte',price:185000,currency:'USD',m2tot:1100,investment:true,featured:true,lat:-34.8700,lng:-56.0620,address:'Carrasco Norte, Montevideo',title:{es:'Terreno para desarrollar',en:'Development land'},desc:{es:'Terreno de 1.100 m² con frente amplio, en una zona residencial consolidada. Apto para vivienda o pequeño desarrollo.',en:'1,100 m² lot with a wide frontage in an established residential area. Suitable for a home or a small development.'}},
+      {op:'venta',type:'apartamento',barrio:'Malvín',price:245000,currency:'USD',m2tot:95,m2edif:88,dorm:2,banos:2,garaje:1,gastos:9500,anio:2019,amen:['terraza','vista','ascensor','parrillero'],featured:true,lat:-34.8925,lng:-56.1040,address:'Rambla de Malvín, Montevideo',title:{es:'Apartamento con vista al mar',en:'Sea-view apartment'},desc:{es:'Apartamento de dos dormitorios con terraza frente a la rambla. Edificio de 2019 con parrillero en azotea.',en:'Two-bedroom apartment with a terrace facing the waterfront. 2019 building with rooftop BBQ area.'}},
+      {op:'alquiler',type:'casa',barrio:'Ciudad de la Costa',price:55000,currency:'UYU',m2tot:600,m2edif:160,dorm:3,banos:2,garaje:1,amen:['jardin','parrillero'],lat:-34.8290,lng:-55.9850,address:'Ciudad de la Costa, Canelones',title:{es:'Casa a dos cuadras de la playa',en:'House two blocks from the beach'},desc:{es:'Casa de tres dormitorios con jardín y parrillero, a dos cuadras de la playa.',en:'Three-bedroom house with garden and BBQ area, two blocks from the beach.'}},
+      {op:'alquiler',type:'oficina',barrio:'Buceo',price:1400,currency:'USD',m2tot:70,m2edif:70,banos:1,garaje:1,gastos:7800,anio:2015,amen:['ascensor','seguridad'],lat:-34.9020,lng:-56.1330,address:'Buceo, Montevideo',title:{es:'Oficina en torre corporativa',en:'Office in a corporate tower'},desc:{es:'Oficina de 70 m² en piso alto, con cochera y seguridad 24 horas.',en:'70 m² high-floor office with parking and 24-hour security.'}},
+      {op:'venta',type:'local',barrio:'Carrasco',price:320000,currency:'USD',m2tot:140,m2edif:140,banos:1,investment:true,status:'reservada',lat:-34.8890,lng:-56.0590,address:'Av. Arocena, Carrasco',title:{es:'Local comercial sobre avenida',en:'Retail unit on a main avenue'},desc:{es:'Local de 140 m² con vidriera sobre avenida comercial. Ideal para renta.',en:'140 m² retail unit with a shopfront on a commercial avenue. Well suited for rental income.'}},
+      {op:'venta',type:'casa',barrio:'Malvín',price:395000,currency:'USD',m2tot:450,m2edif:210,dorm:3,banos:2,garaje:1,anio:1975,amen:['jardin','parrillero','calefaccion'],lat:-34.8870,lng:-56.1080,address:'Malvín, Montevideo',title:{es:'Casa de estilo en Malvín',en:'Classic house in Malvín'},desc:{es:'Casa de estilo con ambientes amplios, jardín al fondo y garaje.',en:'Classic house with generous rooms, back garden and garage.'}},
+      {op:'venta',type:'terreno',barrio:'Ciudad de la Costa',price:68000,currency:'USD',m2tot:800,investment:true,lat:-34.8180,lng:-55.9600,address:'Ciudad de la Costa, Canelones',title:{es:'Lote en zona en crecimiento',en:'Lot in a growing area'},desc:{es:'Lote de 800 m² en una zona con fuerte crecimiento residencial.',en:'800 m² lot in an area with strong residential growth.'}}
+    ];
+    return d.map((o,i)=>({id:'s'+(i+1),code:'ALV-'+(101+i),created:Date.now()-i*86400000,photos:[],amen:[],video:'',status:'publicada',featured:false,investment:false,gastos:'',anio:'',m2edif:'',garaje:0,dorm:'',banos:'',...o}));
+  }
+
+  db(op,k,v){
+    const ls=()=>{ try{ if(op==='get'){ const s=localStorage.getItem('alvora-'+k); return s?JSON.parse(s):undefined; } localStorage.setItem('alvora-'+k,JSON.stringify(v)); return true; }catch(e){ return op==='get'?undefined:false; } };
+    return new Promise(res=>{ try{ const r=indexedDB.open('alvora-web',1); r.onupgradeneeded=()=>r.result.createObjectStore('kv'); r.onerror=()=>res(ls());
+      r.onsuccess=()=>{ const d=r.result; const tx=d.transaction('kv',op==='get'?'readonly':'readwrite'); const st=tx.objectStore('kv');
+        if(op==='get'){ const q=st.get(k); q.onsuccess=()=>res(q.result); q.onerror=()=>res(undefined); } else { st.put(v,k); tx.oncomplete=()=>res(true); tx.onerror=()=>res(false); } };
+    }catch(e){ res(ls()); } });
+  }
+
+  onResize = () => { const m=window.innerWidth<900; if(m!==this.state.mobile) this.setState({mobile:m,menu:false}); };
+  async componentDidMount(){
+    window.addEventListener('hashchange',this.onHash);
+    window.addEventListener('resize',this.onResize); this.onResize();
+    let props=await this.db('get','props'); if(!props){ props=this.seed(); await this.db('set','props',props); }
+    const settings={...this.defSettings(),...((await this.db('get','settings'))||{})};
+    const leads=(await this.db('get','leads'))||[];
+    this.setState({props,settings,leads,lang:localStorage.getItem('alvora-lang')||'es',cur:localStorage.getItem('alvora-cur')||'USD'});
+    this.syncMaps();
+  }
+  componentDidUpdate(){ this.syncMaps(); }
+  componentWillUnmount(){ window.removeEventListener('hashchange',this.onHash); window.removeEventListener('resize',this.onResize); if(this._lw) clearInterval(this._lw); Object.values(this.maps).forEach(m=>m.map.remove()); }
+  onHash = () => { this.setState({route:this.parse(),gIdx:0,leadOk:'',leadErr:'',menu:false}); window.scrollTo(0,0); };
+
+  t(){ return this.T[this.state.lang]||this.T.es; }
+  num(n){ return Number(n||0).toLocaleString('es-UY'); }
+  rate(){ return +this.state.settings.rate||40; }
+  priceIn(p,cur){ const v=+p.price||0; if(p.currency===cur) return v; return cur==='USD'? v/this.rate() : v*this.rate(); }
+  fmtMoney(v,cur){ return (cur==='USD'?'USD ':'$ ')+this.num(Math.round(v)); }
+  fmtPrice(p){ const s=this.fmtMoney(this.priceIn(p,this.state.cur),this.state.cur); return p.op==='alquiler'? s+' '+this.t().perMonth : s; }
+  shortPrice(p){ const cur=this.state.cur, v=Math.round(this.priceIn(p,cur)); const s=v>=1e6?(v/1e6).toFixed(1).replace(/\.0$/,'')+'M':v>=1000?Math.round(v/1000)+'k':String(v); return (cur==='USD'?'USD ':'$ ')+s; }
+  pub(){ return this.state.props.filter(p=>p.status!=='borrador'); }
+  ttl(p){ const L=this.state.lang; return (p.title&&(p.title[L]||p.title.es))||''; }
+  wa(text){ const n=String(this.state.settings.whatsapp||'').replace(/\D/g,''); return 'https://wa.me/'+n+'?text='+encodeURIComponent(text); }
+
+  filtered(){
+    const s=this.state,f=s.f, nv=x=>x===''||x==null?null:+x;
+    const pmin=nv(f.pmin),pmax=nv(f.pmax),mmin=nv(f.mmin),mmax=nv(f.mmax);
+    const a=this.pub().filter(p=>{
+      if(f.op&&p.op!==f.op) return false; if(f.type&&p.type!==f.type) return false; if(f.barrio&&p.barrio!==f.barrio) return false;
+      const pr=this.priceIn(p,s.cur); if(pmin!=null&&pr<pmin) return false; if(pmax!=null&&pr>pmax) return false;
+      const m=+(f.mbase==='tot'?p.m2tot:p.m2edif)||0; if(mmin!=null&&m<mmin) return false; if(mmax!=null&&m>mmax) return false;
+      if(f.dorm&&(+p.dorm||0)<f.dorm) return false; if(f.banos&&(+p.banos||0)<f.banos) return false;
+      if(f.garaje&&!(+p.garaje>0)) return false; if(f.amen.length&&!f.amen.every(x=>(p.amen||[]).includes(x))) return false;
+      return true; });
+    const so={recent:(x,y)=>(y.created||0)-(x.created||0),low:(x,y)=>this.priceIn(x,s.cur)-this.priceIn(y,s.cur),high:(x,y)=>this.priceIn(y,s.cur)-this.priceIn(x,s.cur),m2:(x,y)=>(+y.m2tot||0)-(+x.m2tot||0)};
+    return a.sort(so[f.sort]||so.recent);
+  }
+
+  card(p){
+    const t=this.t(), sp=[];
+    if(p.type==='terreno'){ if(p.m2tot) sp.push(this.num(p.m2tot)+' m²'); }
+    else { const m=p.m2edif||p.m2tot; if(m) sp.push(this.num(m)+' m²'); if(+p.dorm) sp.push(p.dorm+' '+t.dormShort); if(+p.banos) sp.push(p.banos+' '+t.banosShort); if(+p.garaje) sp.push(t.garajeShort); }
+    const ph=(p.photos||[])[0]||'';
+    return {id:p.id,href:'#/propiedad/'+p.id,title:this.ttl(p),barrio:p.barrio,typeLabel:t.types[p.type],opLabel:t[p.op],price:this.fmtPrice(p),specs:sp.join('  ·  '),hasPhoto:!!ph,noPhoto:!ph,photo:ph,hasStatus:p.status!=='publicada',statusLabel:t.status[p.status]};
+  }
+
+  setF(patch){ this.setState(s=>({f:{...s.f,...patch}})); }
+  handler(key){ return e=>{ const {name,type,value,checked}=e.target; this.setState(s=>({[key]:{...s[key],[name]:type==='checkbox'?checked:value}})); }; }
+  onFilter=this.handler('f'); onQs=this.handler('qs'); onLead=this.handler('lead'); onField=this.handler('form'); onSd=this.handler('sd');
+
+  sendLead(kind,extra){
+    const l=this.state.lead; if(!l.name.trim()||!l.phone.trim()){ this.setState({leadErr:kind}); return; }
+    const rec={id:Date.now().toString(36),kind,created:Date.now(),...l,...(extra||{})};
+    const leads=[rec,...this.state.leads]; this.db('set','leads',leads);
+    this.setState({leads,lead:this.emptyLead(),leadOk:kind,leadErr:''});
+  }
+
+  syncMaps(){
+    if(!window.L){ if(!this._lw) this._lw=setInterval(()=>{ if(window.L){ clearInterval(this._lw); this._lw=null; this.syncMaps(); } },250); return; }
+    const L=window.L, s=this.state, def=[-34.885,-56.08];
+    const lm=this.ensureMap('list',this.listMapRef.current,def,12);
+    if(lm){ const m=this.maps.list, ps=this.filtered().filter(p=>p.lat&&p.lng), sig=ps.map(p=>p.id).join()+s.cur;
+      if(m.sig!==sig){ m.sig=sig; m.layer.clearLayers(); ps.forEach(p=>L.marker([p.lat,p.lng],{icon:this.pin(this.shortPrice(p))}).bindTooltip(this.ttl(p),{direction:'top',offset:[0,-34]}).on('click',()=>{ window.location.hash='#/propiedad/'+p.id; }).addTo(m.layer));
+        if(ps.length) lm.fitBounds(L.latLngBounds(ps.map(p=>[p.lat,p.lng])).pad(0.25),{maxZoom:15}); } }
+    const cp=s.route.page==='propiedad'?s.props.find(p=>p.id===s.route.id):null;
+    const pm=this.ensureMap('prop',this.propMapRef.current,cp&&cp.lat?[cp.lat,cp.lng]:def,15);
+    if(pm&&cp){ const m=this.maps.prop; if(m.sig!==cp.id){ m.sig=cp.id; m.layer.clearLayers(); if(cp.lat){ L.marker([cp.lat,cp.lng],{icon:this.pin(cp.barrio)}).addTo(m.layer); pm.setView([cp.lat,cp.lng],15); } } }
+    const f=s.form, has=f&&f.lat!==''&&f.lng!=='';
+    const am=this.ensureMap('admin',this.adminMapRef.current,has?[+f.lat,+f.lng]:def,has?15:12,map=>map.on('click',e=>this.setState(st=>({form:{...st.form,lat:e.latlng.lat.toFixed(5),lng:e.latlng.lng.toFixed(5)}}))));
+    if(am&&f){ const m=this.maps.admin, sig=f.lat+','+f.lng; if(m.sig!==sig){ m.sig=sig; m.layer.clearLayers(); if(has) L.marker([+f.lat,+f.lng],{icon:this.pin(f.barrio||'•')}).addTo(m.layer); } }
+  }
+  ensureMap(key,el,center,zoom,onInit){
+    const m=this.maps[key]; if(m&&el&&m.el===el) return m.map;
+    if(m){ try{ m.map.remove(); }catch(e){} delete this.maps[key]; }
+    if(!el) return null;
+    const L=window.L, map=L.map(el,{scrollWheelZoom:false}).setView(center,zoom);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap · © CARTO',maxZoom:19}).addTo(map);
+    this.maps[key]={map,layer:L.layerGroup().addTo(map),el,sig:null};
+    if(onInit) onInit(map); setTimeout(()=>map.invalidateSize(),150);
+    return map;
+  }
+  pin(label){ return window.L.divIcon({className:'',iconSize:null,iconAnchor:[0,0],html:'<div style="transform:translate(-50%,-100%);display:inline-block;white-space:nowrap;background:#18293A;color:#EEE3D0;border:1px solid #C9AE82;font:500 12px Raleway,sans-serif;letter-spacing:.04em;padding:6px 10px;box-shadow:0 4px 10px rgba(0,0,0,.25)">'+label+'</div>'}); }
+
+  embed(u){ if(!u) return ''; let m=u.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([\w-]{6,})/); if(m) return 'https://www.youtube.com/embed/'+m[1]; m=u.match(/vimeo\.com\/(\d+)/); if(m) return 'https://player.vimeo.com/video/'+m[1]; if(/matterport\.com|kuula\.co/.test(u)) return u; return ''; }
+
+  resize(file){ return new Promise(res=>{ const fr=new FileReader(); fr.onload=()=>{ const img=new Image(); img.onload=()=>{ const s=Math.min(1,1600/Math.max(img.width,img.height)); const c=document.createElement('canvas'); c.width=Math.round(img.width*s); c.height=Math.round(img.height*s); c.getContext('2d').drawImage(img,0,0,c.width,c.height); res(c.toDataURL('image/jpeg',0.82)); }; img.onerror=()=>res(null); img.src=fr.result; }; fr.readAsDataURL(file); }); }
+
+  blankForm(){ return {id:null,code:'',op:'venta',type:'casa',barrio:'Carrasco',address:'',price:'',currency:'USD',m2tot:'',m2edif:'',dorm:'',banos:'',garaje:'',gastos:'',anio:'',video:'',lat:'',lng:'',title_es:'',title_en:'',desc_es:'',desc_en:'',status:'publicada',featured:false,investment:false,amen:[],photos:[],created:null}; }
+  toForm(p){ const v=x=>x==null?'':String(x); return {...this.blankForm(),id:p.id,code:p.code,op:p.op,type:p.type,barrio:p.barrio,address:p.address||'',price:v(p.price),currency:p.currency,m2tot:v(p.m2tot),m2edif:v(p.m2edif),dorm:v(p.dorm),banos:v(p.banos),garaje:v(p.garaje||''),gastos:v(p.gastos),anio:v(p.anio),video:p.video||'',lat:v(p.lat),lng:v(p.lng),title_es:(p.title||{}).es||'',title_en:(p.title||{}).en||'',desc_es:(p.desc||{}).es||'',desc_en:(p.desc||{}).en||'',status:p.status,featured:!!p.featured,investment:!!p.investment,amen:[...(p.amen||[])],photos:[...(p.photos||[])],created:p.created}; }
+  nextCode(props){ const mx=props.reduce((m,p)=>Math.max(m,parseInt(String(p.code||'').replace(/\D/g,''))||0),100); return 'ALV-'+(mx+1); }
+  async saveProps(props,msg){ const ok=await this.db('set','props',props); this.setState({props,adminMsg:ok?msg:'No se pudo guardar. Puede que el almacenamiento esté lleno (reducí fotos).'}); return ok; }
+  updateProp(id,patch){ this.saveProps(this.state.props.map(p=>p.id===id?{...p,...patch}:p),'Cambios guardados.'); }
+  saveForm = async () => {
+    const f=this.state.form; if(!f.title_es.trim()||!f.price){ this.setState({adminMsg:'Completá al menos el título en español y el precio.'}); return; }
+    const n=x=>x===''||x==null?'':+x, props=[...this.state.props];
+    const p={id:f.id||Date.now().toString(36),code:f.code||this.nextCode(props),op:f.op,type:f.type,barrio:f.barrio,address:f.address,price:+f.price,currency:f.currency,m2tot:n(f.m2tot),m2edif:n(f.m2edif),dorm:n(f.dorm),banos:n(f.banos),garaje:n(f.garaje)||0,gastos:n(f.gastos),anio:n(f.anio),video:f.video.trim(),lat:n(f.lat),lng:n(f.lng),title:{es:f.title_es,en:f.title_en},desc:{es:f.desc_es,en:f.desc_en},status:f.status,featured:!!f.featured,investment:!!f.investment,amen:f.amen,photos:f.photos,created:f.created||Date.now()};
+    const i=props.findIndex(x=>x.id===p.id); if(i>=0) props[i]=p; else props.unshift(p);
+    if(await this.saveProps(props,'Publicación '+p.code+' guardada.')) { this.setState({form:null,tab:'list'}); window.scrollTo(0,0); }
+  };
+  onPhotos = async e => { const files=[...e.target.files]; e.target.value=''; if(!files.length) return; this.setState({adminMsg:'Procesando fotos…'}); const out=[]; for(const f of files){ const r=await this.resize(f); if(r) out.push(r); } this.setState(s=>({form:{...s.form,photos:[...s.form.photos,...out]},adminMsg:out.length+' foto(s) agregada(s). Recordá guardar.'})); };
+  exportData = () => { const blob=new Blob([JSON.stringify({props:this.state.props,leads:this.state.leads,settings:this.state.settings})],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='alvora-datos-'+new Date().toISOString().slice(0,10)+'.json'; a.click(); };
+  importData = e => { const file=e.target.files[0]; e.target.value=''; if(!file) return; const fr=new FileReader(); fr.onload=async()=>{ try{ const d=JSON.parse(fr.result); const props=d.props||[],leads=d.leads||[],settings={...this.defSettings(),...(d.settings||{})}; await this.db('set','props',props); await this.db('set','leads',leads); await this.db('set','settings',settings); this.setState({props,leads,settings,sd:{...settings},adminMsg:'Datos importados.'}); }catch(err){ this.setState({adminMsg:'Archivo inválido.'}); } }; fr.readAsText(file); };
+
+  renderVals(){
+    const s=this.state, t=this.t(), r=s.route, E=this.T.es;
+    const pages=['inicio','propiedades','propiedad','nosotros','tasar','inversores','contacto','admin'];
+    const page=pages.includes(r.page)?r.page:'inicio'; const pg={}; pages.forEach(k=>pg[k]=page===k);
+    const chip=(on,dark)=>dark?{bg:on?'#C9AE82':'transparent',fg:on?'#18293A':'#EEE3D0'}:{bg:on?'#18293A':'#FFFFFF',fg:on?'#EEE3D0':'#18293A'};
+    const nav=[['inicio','#/',t.nav.home],['propiedades','#/propiedades',t.nav.props],['nosotros','#/nosotros',t.nav.about],['inversores','#/inversores',t.nav.inv],['tasar','#/tasar',t.nav.value],['contacto','#/contacto',t.nav.contact]].map(([k,href,label])=>{ const a=pg[k]||(k==='propiedades'&&pg.propiedad); return {href,label,color:a?'#C9AE82':'#EEE3D0',border:a?'#C9AE82':'transparent'}; });
+    const langOpts=[['es','ES'],['en','EN']].map(([v,label])=>({label,...chip(s.lang===v,true),onClick:()=>{ localStorage.setItem('alvora-lang',v); this.setState({lang:v}); }}));
+    const curOpts=['USD','UYU'].map(v=>({label:v,...chip(s.cur===v),onClick:()=>{ localStorage.setItem('alvora-cur',v); this.setState({cur:v}); }}));
+    const typeOptions=[{v:'',label:t.anyType},...this.TYPES.map(v=>({v,label:t.types[v]}))];
+    const barrioOptions=[{v:'',label:t.anyBarrio},...this.B.map(b=>({v:b,label:b}))];
+    const pub=this.pub();
+    let feat=pub.filter(p=>p.featured); if(!feat.length) feat=[...pub].sort((a,b)=>(b.created||0)-(a.created||0)); feat=feat.slice(0,6);
+    const services=t.svc.map((v,i)=>({...v,n:'0'+(i+1),onClick:()=>{ if(i===3){ window.location.hash='#/inversores'; return; } this.setState({f:{...this.emptyF(),type:['casa','terreno','local'][i]}}); window.location.hash='#/propiedades'; }}));
+    const zones=this.FOCUS.map(b=>{ const n=pub.filter(p=>p.barrio===b).length; return {name:b,count:n+' '+(n===1?t.prop1:t.propN),onClick:()=>{ this.setState({f:{...this.emptyF(),barrio:b}}); window.location.hash='#/propiedades'; }}; });
+    const f=s.f, list=this.filtered();
+    const opOpts=[['',t.all],['venta',t.venta],['alquiler',t.alquiler]].map(([v,label])=>({label,...chip(f.op===v),onClick:()=>this.setF({op:v})}));
+    const dormOpts=[0,1,2,3,4].map(n=>({label:n?n+'+':t.any,...chip(f.dorm===n),onClick:()=>this.setF({dorm:n})}));
+    const banosOpts=[0,1,2,3].map(n=>({label:n?n+'+':t.any,...chip(f.banos===n),onClick:()=>this.setF({banos:n})}));
+    const mbaseOpts=[['tot',t.m2totShort],['edif',t.m2edifShort]].map(([v,label])=>({label,...chip(f.mbase===v),onClick:()=>this.setF({mbase:v})}));
+    const amenOpts=this.AMEN.map(a=>{ const on=f.amen.includes(a); return {label:t.amen[a],...chip(on),onClick:()=>this.setF({amen:on?f.amen.filter(x=>x!==a):[...f.amen,a]})}; });
+    const viewOpts=[['grid',t.viewGrid],['map',t.viewMap]].map(([v,label])=>({label,...chip(s.view===v),onClick:()=>this.setState({view:v})}));
+    const sortOptions=[['recent',t.sortRecent],['low',t.sortLow],['high',t.sortHigh],['m2',t.sortM2]].map(([v,label])=>({v,label}));
+
+    const cp=pg.propiedad?s.props.find(p=>p.id===r.id&&p.status!=='borrador'):null;
+    let P={};
+    if(cp){
+      const photos=cp.photos||[], gi=Math.min(s.gIdx,Math.max(0,photos.length-1)), m=x=>x?this.num(x)+' m²':'';
+      const specs=[[t.code,cp.code],[t.operation,t[cp.op]],[t.type,t.types[cp.type]],[t.barrio,cp.barrio],[t.m2tot,m(cp.m2tot)],[t.m2edif,m(cp.m2edif)],[t.dorm,+cp.dorm?cp.dorm:''],[t.banos,+cp.banos?cp.banos:''],[t.garaje,+cp.garaje?cp.garaje:''],[t.gastos,+cp.gastos?'$ '+this.num(cp.gastos)+' '+t.perMonth:''],[t.anio,cp.anio||'']].filter(x=>x[1]!==''&&x[1]!=null).map(([label,value])=>({label,value:String(value)}));
+      const desc=((cp.desc&&(cp.desc[s.lang]||cp.desc.es))||'').split(/\n\s*\n/).filter(Boolean);
+      const emb=this.embed(cp.video), go=d=>()=>this.setState({gIdx:(gi+d+photos.length)%photos.length});
+      P={title:this.ttl(cp),eyebrow:t.types[cp.type]+' · '+t[cp.op]+' · '+cp.barrio+(cp.status!=='publicada'?' · '+t.status[cp.status]:''),address:cp.address||cp.barrio,price:this.fmtPrice(cp),original:cp.currency===s.cur?'':t.published+': '+this.fmtMoney(cp.price,cp.currency),code:cp.code,
+        hasPhotos:photos.length>0,noPhotos:!photos.length,mainPhoto:photos[gi]||'',multi:photos.length>1,counter:(gi+1)+' / '+photos.length,prev:go(-1),next:go(1),
+        thumbs:photos.map((src,i)=>({src,op:i===gi?1:0.6,ring:i===gi?'#C9AE82':'transparent',onClick:()=>this.setState({gIdx:i})})),
+        specs,paras:desc,amen:(cp.amen||[]).map(a=>t.amen[a]),hasAmen:(cp.amen||[]).length>0,hasEmbed:!!emb,embed:emb,hasLink:!!cp.video&&!emb,video:cp.video,hasMap:!!(cp.lat&&cp.lng),
+        wa:this.wa(t.waMsg+' '+cp.code+' — '+this.ttl(cp))};
+    }
+    const inv=pub.filter(p=>p.investment);
+    const lk=k=>({ok:s.leadOk===k,form:s.leadOk!==k,err:s.leadErr===k});
+    const V=lk('visita'),VA=lk('tasacion'),IN=lk('inversor'),CO=lk('contacto');
+    const waNum=String(s.settings.whatsapp||'').replace(/\D/g,'');
+
+    const A=this.adminVals();
+    return {
+      ...A, pg, isPublic:!pg.admin, t, nav,
+      isMobile:!!s.mobile, isDesktop:!s.mobile, menuOpen:!!s.mobile&&!!s.menu, toggleMenu:()=>this.setState(st=>({menu:!st.menu})),
+      bar1:s.menu?'translateY(7px) rotate(45deg)':'none', bar2:s.menu?0:1, bar3:s.menu?'translateY(-7px) rotate(-45deg)':'none', langOpts, curOpts, waGeneral:this.wa(t.waHello), waDisplay:'+'+waNum, mailHref:'mailto:'+s.settings.email, settings:s.settings,
+      qs:s.qs, onQs:this.onQs, doSearch:()=>{ this.setState({f:{...this.emptyF(),...s.qs}}); window.location.hash='#/propiedades'; },
+      typeOptions, barrioOptions, featuredCards:feat.map(p=>this.card(p)), services, zones,
+      f, onFilter:this.onFilter, clearFilters:()=>this.setState({f:this.emptyF()}), opOpts, dormOpts, banosOpts, mbaseOpts, amenOpts, viewOpts, sortOptions,
+      priceLabel:t.price+' ('+s.cur+')', resultsLabel:list.length+' '+(list.length===1?t.prop1:t.propN), cards:list.map(p=>this.card(p)), noResults:list.length===0,
+      isMapView:s.view==='map', isGridView:s.view==='grid', listMapRef:this.listMapRef, propMapRef:this.propMapRef,
+      hasProp:!!cp, noProp:pg.propiedad&&!cp, P,
+      investCards:inv.map(p=>this.card(p)), noInvest:inv.length===0,
+      lead:s.lead, onLead:this.onLead,
+      okVisit:V.ok, formVisit:V.form, errVisit:V.err, sendVisit:()=>this.sendLead('visita',{prop:cp?cp.code:''}),
+      okValue:VA.ok, formValue:VA.form, errValue:VA.err, sendValue:()=>this.sendLead('tasacion'),
+      okInv:IN.ok, formInv:IN.form, errInv:IN.err, sendInv:()=>this.sendLead('inversor'),
+      okContact:CO.ok, formContact:CO.form, errContact:CO.err, sendContact:()=>this.sendLead('contacto')
+    };
+  }
+
+  adminVals(){
+    const s=this.state, E=this.T.es;
+    const tabs=[['list','Publicaciones ('+s.props.length+')'],['leads','Consultas ('+s.leads.length+')'],['settings','Ajustes']].map(([v,label])=>{ const on=s.tab===v||(v==='list'&&s.tab==='edit'); return {label,bg:on?'#18293A':'transparent',fg:on?'#EEE3D0':'#18293A',onClick:()=>this.setState({tab:v,form:null,adminMsg:'',sd:v==='settings'?{...s.settings}:s.sd})}; });
+    const rows=[...s.props].sort((a,b)=>(b.created||0)-(a.created||0)).map(p=>{ const ph=(p.photos||[])[0]||''; return {
+      code:p.code,title:(p.title||{}).es||'(sin título)',meta:E.types[p.type]+' · '+E[p.op]+' · '+p.barrio,price:this.fmtMoney(p.price,p.currency)+(p.op==='alquiler'?' /mes':''),thumb:ph,hasThumb:!!ph,noThumb:!ph,nPhotos:(p.photos||[]).length+' fotos',
+      status:p.status,onStatus:e=>this.updateProp(p.id,{status:e.target.value}),
+      featLabel:p.featured?'Destacada':'Destacar',featBg:p.featured?'#C9AE82':'#FFFFFF',onFeat:()=>this.updateProp(p.id,{featured:!p.featured}),
+      href:'#/propiedad/'+p.id,onEdit:()=>{ this.setState({tab:'edit',form:this.toForm(p),adminMsg:''}); window.scrollTo(0,0); },
+      onDelete:()=>{ if(confirm('¿Eliminar '+p.code+'? Esta acción no se puede deshacer.')) this.saveProps(s.props.filter(x=>x.id!==p.id),p.code+' eliminada.'); } }; });
+    const fm=s.form;
+    const formAmen=fm?this.AMEN.map(a=>{ const on=fm.amen.includes(a); return {label:E.amen[a],bg:on?'#18293A':'#FFFFFF',fg:on?'#EEE3D0':'#18293A',onClick:()=>this.setState(st=>({form:{...st.form,amen:on?st.form.amen.filter(x=>x!==a):[...st.form.amen,a]}}))}; }):[];
+    const formPhotos=fm?fm.photos.map((src,i)=>({src,isCover:i===0,notCover:i!==0,
+      onRemove:()=>this.setState(st=>({form:{...st.form,photos:st.form.photos.filter((_,j)=>j!==i)}})),
+      onCover:()=>this.setState(st=>{ const ph=[...st.form.photos]; const [x]=ph.splice(i,1); ph.unshift(x); return {form:{...st.form,photos:ph}}; })})):[];
+    const kinds={visita:'Visita',tasacion:'Tasación',inversor:'Inversor',contacto:'Contacto'};
+    const leads=s.leads.map(l=>{ const det=[l.prop&&('Propiedad '+l.prop),l.date&&('Fecha '+l.date+(l.time?' '+l.time:'')),l.type&&E.types[l.type],l.barrio,l.m2&&(l.m2+' m²'),l.budget&&('Presupuesto '+l.budget),l.email].filter(Boolean).join(' · ');
+      return {kind:kinds[l.kind]||l.kind,name:l.name,phone:l.phone,when:new Date(l.created).toLocaleString('es-UY',{dateStyle:'short',timeStyle:'short'}),det,msg:l.msg||'',hasMsg:!!l.msg,
+        wa:'https://wa.me/'+String(l.phone).replace(/\D/g,'')+'?text='+encodeURIComponent('Hola '+l.name+', te escribimos de ALVORA.'),
+        onDelete:()=>{ if(confirm('¿Eliminar esta consulta?')){ const leads=s.leads.filter(x=>x.id!==l.id); this.db('set','leads',leads); this.setState({leads}); } }}; });
+    return {
+      adminOk:s.admin, adminLogin:!s.admin, pw:s.pw, pwErr:s.pwErr,
+      onPw:e=>this.setState({pw:e.target.value,pwErr:false}),
+      onPwKey:e=>{ if(e.key==='Enter') this.doLogin(); }, doLogin:()=>this.doLogin(),
+      logout:()=>{ sessionStorage.removeItem('alvora-admin'); this.setState({admin:false}); },
+      tabs, adminMsg:s.adminMsg, hasMsg:!!s.adminMsg,
+      tabList:s.tab==='list', tabEdit:s.tab==='edit'&&!!fm, tabLeads:s.tab==='leads', tabSettings:s.tab==='settings'&&!!s.sd,
+      rows, noRows:rows.length===0, statusOptions:this.STATUS.map(v=>({v,label:E.status[v]})),
+      newProp:()=>{ this.setState({tab:'edit',form:this.blankForm(),adminMsg:''}); window.scrollTo(0,0); },
+      form:fm||this.blankForm(), onField:this.onField, formTitle:fm&&fm.id?'Editar '+fm.code:'Nueva publicación',
+      typeOptionsA:this.TYPES.map(v=>({v,label:E.types[v]})), barrioOptionsA:this.B.map(b=>({v:b,label:b})),
+      formAmen, formPhotos, hasFormPhotos:formPhotos.length>0, onPhotos:this.onPhotos, adminMapRef:this.adminMapRef,
+      clearLoc:()=>this.setState(st=>({form:{...st.form,lat:'',lng:''}})),
+      saveForm:this.saveForm, cancelForm:()=>this.setState({tab:'list',form:null,adminMsg:''}),
+      leadRows:leads, noLeads:leads.length===0,
+      sd:s.sd||this.defSettings(), onSd:this.onSd,
+      saveSettings:async()=>{ const settings={...s.sd,rate:+s.sd.rate||40}; await this.db('set','settings',settings); this.setState({settings,adminMsg:'Ajustes guardados.'}); },
+      exportData:this.exportData, importData:this.importData,
+      resetDemo:async()=>{ if(!confirm('¿Reemplazar todas las publicaciones por los datos de ejemplo?')) return; this.saveProps(this.seed(),'Datos de ejemplo restaurados.'); }
+    };
+  }
+  doLogin(){ if(this.state.pw===this.state.settings.password){ sessionStorage.setItem('alvora-admin','1'); this.setState({admin:true,pw:'',pwErr:false}); } else this.setState({pwErr:true}); }
+}
+</script>
+</body>
+</html>
